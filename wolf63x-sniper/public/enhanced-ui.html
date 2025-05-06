@@ -1,0 +1,578 @@
+<!DOCTYPE html> 
+<html lang="en" style="margin:0; padding:0; background-color:#0F1115; display:block;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wolf63x Sniper Bot - Enhanced UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="ui-components.css">
+    <link rel="stylesheet" href="modern-dashboard.css">
+    <link rel="stylesheet" href="modern-sidebar.css">
+    <link rel="stylesheet" href="dashboard-panels.css">
+    <link rel="stylesheet" href="dashboard-stats-fix.css">
+    <link rel="stylesheet" href="css/modern-theme.css">
+    <link rel="stylesheet" href="css/token-styles.css">
+    <link rel="stylesheet" href="css/dashboard-grid.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-gradient"></script>
+</head>
+<body class="custom-scrollbar grid-background">
+    <div class="app-container dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="https://via.placeholder.com/150x40/14F195/000000?text=WOLF63X" alt="Wolf63x Logo">
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-crosshairs"></i>
+                    <span class="nav-text">Sniper</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span class="nav-text">Trading</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-wallet"></i>
+                    <span class="nav-text">Portfolio</span>
+                </a>
+                
+                <div class="nav-divider"></div>
+                
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span class="nav-text">Settings</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="nav-text">Help</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="wallet-info">
+                    <i class="fas fa-wallet"></i>
+                    <span class="wallet-address">FGh5...j28K</span>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="dashboard-title">
+                    Dashboard <span class="badge status-active">Enhanced UI</span>
+                </div>
+                
+                <div class="top-bar-right">
+                    <!-- Network Status -->
+                    <div class="network-monitor">
+                        <div class="network-info-inline">
+                            <span id="network-name" class="neon-text">Solana Mainnet</span>
+                            <div class="speed-display">
+                                <i class="fas fa-arrow-down"></i>
+                                <span id="download-speed">37ms</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SOL Price Display -->
+                    <div class="sol-price-display pulse-glow">
+                        <div class="sol-price-icon">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div class="sol-price-info">
+                            <div class="sol-current-price">
+                                <span class="sol-price-amount">$158.42</span>
+                            </div>
+                            <div class="sol-price-change positive">
+                                <i class="fas fa-caret-up"></i>
+                                <span>+4.2%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Toggle -->
+                    <div class="theme-toggle">
+                        <label class="theme-switch">
+                            <input type="checkbox" checked>
+                            <span class="theme-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <!-- Connect Wallet Button -->
+                    <button class="btn btn-primary">
+                        <i class="fas fa-wallet"></i>
+                        Connect
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats Bar -->
+            <div id="context-stats">
+                <div id="stats-title">Sniper Stats</div>
+                <div class="stat-display">
+                    <span class="stat-label">Active Bots:</span>
+                    <span class="stat-value status-active">4</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-display">
+                    <span class="stat-label">Today's Profit:</span>
+                    <span class="stat-value positive">+2.45 SOL</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-display">
+                    <i class="fas fa-coins"></i>
+                    <span class="stat-label">SOL Price:</span>
+                    <span id="sol-price" class="stat-value clickable">$158.42</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-display">
+                    <span class="stat-label">Tokens Tracked:</span>
+                    <span class="stat-value">1,485</span>
+                </div>
+                <div id="current-time">03:45:22 PM</div>
+            </div>
+            
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Portfolio Value Card -->
+                <div class="grid-col-8">
+                    <div class="dashboard-card glass-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-chart-line"></i>
+                                Portfolio Performance
+                            </div>
+                            <div class="pill-tabs">
+                                <div class="pill-tab active">Day</div>
+                                <div class="pill-tab">Week</div>
+                                <div class="pill-tab">Month</div>
+                                <div class="pill-tab">All</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="portfolioChart" height="240"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="grid-col-4">
+                    <div class="dashboard-card hover-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-rocket"></i>
+                                Sniper Performance
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="stats-grid">
+                                <div class="stat-card pulse-glow">
+                                    <div class="stat-title">
+                                        <i class="fas fa-bolt"></i>
+                                        Total Snipes
+                                    </div>
+                                    <div class="stat-value animate-number">247</div>
+                                    <div class="stat-change change-up">
+                                        <i class="fas fa-arrow-up"></i>
+                                        12.5%
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-title">
+                                        <i class="fas fa-check-circle"></i>
+                                        Success Rate
+                                    </div>
+                                    <div class="stat-value animate-number">86%</div>
+                                    <div class="stat-change change-up">
+                                        <i class="fas fa-arrow-up"></i>
+                                        3.2%
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-title">
+                                        <i class="fas fa-coins"></i>
+                                        Total Profit
+                                    </div>
+                                    <div class="stat-value animate-number">158.4 SOL</div>
+                                    <div class="stat-change change-up">
+                                        <i class="fas fa-arrow-up"></i>
+                                        18.7%
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-title">
+                                        <i class="fas fa-hourglass-half"></i>
+                                        Avg Response
+                                    </div>
+                                    <div class="stat-value animate-number">0.4s</div>
+                                    <div class="stat-change change-down">
+                                        <i class="fas fa-arrow-down"></i>
+                                        5.1%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Active Trades -->
+                <div class="grid-col-12">
+                    <div class="dashboard-card gradient-border">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-crosshairs"></i>
+                                Active Trades
+                            </div>
+                            <div>
+                                <span class="badge badge-success">5 Active</span>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    New Snipe
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="trades-table">
+                                <thead>
+                                    <tr>
+                                        <th>Token</th>
+                                        <th>Entry Price</th>
+                                        <th>Current Price</th>
+                                        <th>PnL</th>
+                                        <th>Time</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="token-cell">
+                                                <img src="https://via.placeholder.com/30/14F195/FFFFFF?text=M" class="token-icon">
+                                                <div>
+                                                    <div class="token-name">MEME</div>
+                                                    <div class="token-symbol">MEME</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>0.0000324 SOL</td>
+                                        <td>0.0000412 SOL</td>
+                                        <td class="profit-cell positive">+27.2%</td>
+                                        <td>3m ago</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger">Sell</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="token-cell">
+                                                <img src="https://via.placeholder.com/30/5599FF/FFFFFF?text=B" class="token-icon">
+                                                <div>
+                                                    <div class="token-name">BONK</div>
+                                                    <div class="token-symbol">BONK</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>0.0000182 SOL</td>
+                                        <td>0.0000216 SOL</td>
+                                        <td class="profit-cell positive">+18.7%</td>
+                                        <td>17m ago</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger">Sell</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="token-cell">
+                                                <img src="https://via.placeholder.com/30/F3C53C/FFFFFF?text=D" class="token-icon">
+                                                <div>
+                                                    <div class="token-name">DOGE</div>
+                                                    <div class="token-symbol">DOGE</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>0.0000092 SOL</td>
+                                        <td>0.0000083 SOL</td>
+                                        <td class="profit-cell negative">-9.8%</td>
+                                        <td>42m ago</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger">Sell</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Cards -->
+                <div class="grid-col-6">
+                    <div class="dashboard-card hover-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-bolt"></i>
+                                Trending Tokens
+                            </div>
+                            <div class="live-data-indicator">Live Data</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="trending-tokens">
+                                <div class="token-row">
+                                    <div class="token-info">
+                                        <img src="https://via.placeholder.com/24/14F195/FFFFFF?text=S" class="token-mini-icon">
+                                        <span class="token-name">SOL</span>
+                                    </div>
+                                    <div class="token-price">$158.42</div>
+                                    <div class="token-change positive">+4.2%</div>
+                                    <div class="token-volume">$1.2B</div>
+                                </div>
+                                <div class="token-row">
+                                    <div class="token-info">
+                                        <img src="https://via.placeholder.com/24/5599FF/FFFFFF?text=B" class="token-mini-icon">
+                                        <span class="token-name">BONK</span>
+                                    </div>
+                                    <div class="token-price">$0.000023</div>
+                                    <div class="token-change positive">+12.7%</div>
+                                    <div class="token-volume">$345M</div>
+                                </div>
+                                <div class="token-row">
+                                    <div class="token-info">
+                                        <img src="https://via.placeholder.com/24/FF5C79/FFFFFF?text=P" class="token-mini-icon">
+                                        <span class="token-name">PYTH</span>
+                                    </div>
+                                    <div class="token-price">$0.42</div>
+                                    <div class="token-change negative">-2.3%</div>
+                                    <div class="token-volume">$89M</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid-col-6">
+                    <div class="dashboard-card hover-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-bell"></i>
+                                Recent Notifications
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="notification success">
+                                <div class="notification-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">Snipe Successful</div>
+                                    <div class="notification-message">Successfully sniped MEME token at 0.0000324 SOL</div>
+                                </div>
+                            </div>
+                            
+                            <div class="notification info">
+                                <div class="notification-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">New Token Detected</div>
+                                    <div class="notification-message">WOLF token has been added to the tracking list</div>
+                                </div>
+                            </div>
+                            
+                            <div class="notification warning">
+                                <div class="notification-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">Take Profit Alert</div>
+                                    <div class="notification-message">BONK token reached 15% profit target</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal Example -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Sniper Settings</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label for="maxBuy">Maximum Buy Amount</label>
+                        <input type="number" id="maxBuy" class="glass-input" value="5" min="0.1" step="0.1">
+                    </div>
+                    <div class="setting-item">
+                        <label for="slippage">Slippage Tolerance</label>
+                        <input type="number" id="slippage" class="glass-input" value="2.5" min="0.1" step="0.1">
+                    </div>
+                    <div class="setting-item full-width">
+                        <label for="gasSettings">Gas Settings</label>
+                        <input type="text" id="gasSettings" class="glass-input" value="auto">
+                    </div>
+                    <div class="setting-item checkbox-item">
+                        <input type="checkbox" id="autoSell" checked>
+                        <label for="autoSell">Enable Auto-Sell</label>
+                    </div>
+                    <div class="setting-item checkbox-item">
+                        <input type="checkbox" id="frontrunProtection" checked>
+                        <label for="frontrunProtection">Frontrun Protection</label>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary">Cancel</button>
+                    <button class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart Initialization Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Portfolio Chart
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            
+            // Sample data
+            const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+            const data = [125, 132, 128, 142, 135, 157, 163, 168, 172, 165, 178, 185, 192, 188, 196, 205, 212, 218, 225, 230, 242, 236, 248, 253];
+            
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(20, 241, 149, 0.5)');
+            gradient.addColorStop(0.5, 'rgba(20, 241, 149, 0.15)');
+            gradient.addColorStop(1, 'rgba(20, 241, 149, 0)');
+            
+            const portfolioChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Portfolio Value',
+                        data: data,
+                        fill: true,
+                        backgroundColor: gradient,
+                        borderColor: '#14F195',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#14F195',
+                        pointBorderColor: '#0F1115',
+                        pointBorderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(15, 17, 21, 0.9)',
+                            titleColor: '#F8F9FA',
+                            bodyColor: '#F8F9FA',
+                            borderColor: 'rgba(20, 241, 149, 0.3)',
+                            borderWidth: 1,
+                            padding: 10,
+                            cornerRadius: 8,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: 'rgba(248, 249, 250, 0.5)',
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 8
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: 'rgba(248, 249, 250, 0.5)',
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    },
+                    elements: {
+                        point: {
+                            hoverBackgroundColor: '#14F195',
+                            hoverBorderColor: '#0F1115',
+                            hoverBorderWidth: 2,
+                            hoverRadius: 6
+                        }
+                    }
+                }
+            });
+            
+            // Toggle Modal
+            const settingsBtn = document.querySelector('.btn-sm.btn-primary');
+            const modal = document.getElementById('settingsModal');
+            const closeModal = document.querySelector('.close-modal');
+            
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', function() {
+                    modal.classList.add('active');
+                });
+            }
+            
+            if (closeModal) {
+                closeModal.addEventListener('click', function() {
+                    modal.classList.remove('active');
+                });
+            }
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

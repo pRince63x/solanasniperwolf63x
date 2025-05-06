@@ -1,0 +1,59 @@
+<!-- Portfolio Page -->
+<section id="portfolio-page" class="page">
+    <div class="portfolio-container card">
+        <div class="portfolio-header">
+            <h2 class="portfolio-title">My Portfolio</h2>
+            <div class="portfolio-controls">
+                <button class="btn btn-primary" id="refresh-portfolio">↻ Refresh</button>
+                <button class="btn btn-primary" id="export-portfolio">📊 Export</button>
+            </div>
+        </div>
+        
+        <div class="portfolio-summary">
+            <div class="summary-card">
+                <div class="summary-title">Total Value</div>
+                <div class="summary-value">$5,842.76</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">24h Change</div>
+                <div class="summary-value positive">+$138.24 (+2.4%)</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">SOL Balance</div>
+                <div class="summary-value">24.8 SOL</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">Token Count</div>
+                <div class="summary-value">18</div>
+            </div>
+        </div>
+        
+        <div class="portfolio-assets">
+            <h3>Assets</h3>
+            <div class="assets-table-container">
+                <table class="assets-table">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Balance</th>
+                            <th>Price</th>
+                            <th>Value</th>
+                            <th>24h</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="portfolio-assets-body">
+                        <!-- Assets will be populated here via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="portfolio-nfts">
+            <h3>NFTs</h3>
+            <div class="nfts-grid" id="nfts-grid">
+                <!-- NFTs will be populated here via JavaScript -->
+            </div>
+        </div>
+    </div>
+</section>

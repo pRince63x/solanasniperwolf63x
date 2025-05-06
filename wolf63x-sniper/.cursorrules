@@ -1,0 +1,87 @@
+# Cursor Rules for Wolf63x Solana Sniper Bot
+
+This document explains the custom Cursor rules set up for this project to reduce bugs and improve code completion speed.
+
+## Overview
+
+The `.cursor/settings.json` file contains configuration for:
+
+1. **Completion Rules** - Patterns to enhance AI code suggestions
+2. **Code Snippets** - Pre-defined templates for common patterns
+3. **Lint Rules** - Custom rules to detect potential bugs
+4. **Semantic Settings** - Optimize how Cursor understands code context
+
+## Completion Rules
+
+These rules help Cursor better understand our code patterns and prioritize relevant completions:
+
+| Rule Name | Description | Benefit |
+|-----------|-------------|---------|
+| Solana Address Patterns | Recognizes wallet and token addresses | Better suggestions when working with blockchain addresses |
+| Tokio Async Patterns | Improves async/await Rust completions | Better handling of asynchronous code in Rust |
+| Rust Error Handling | Better error handling in Rust | Suggests proper error handling patterns |
+| JavaScript Event Handlers | Improves event handler completions | Better DOM event handling suggestions |
+| JavaScript Chart.js | Better Chart.js completions | Improves dashboard chart code suggestions |
+| JavaScript API Calls | Improves API call completions | Better fetch and Promise handling |
+| CSS Class Naming | Better CSS class completions | Improved styling suggestions |
+| Solana Transaction Patterns | Enhances Solana transaction code | Better wallet interaction and transaction code |
+| UI Component Patterns | Better UI component completions | Improved HTML and component structure |
+| Notification Patterns | Improves notification completions | Better notification system suggestions |
+| Rust Mutex Patterns | Better mutex handling completions | Safer concurrency code in Rust |
+| State Management | Improves state management completions | Better global and local state handling |
+
+## Code Snippets
+
+These snippets provide templates for common code patterns:
+
+| Snippet Name | When Triggered | Benefit |
+|--------------|----------------|---------|
+| Rust Result Handling | When typing `match` | Proper error handling pattern with Ok/Err cases |
+| Transaction Processing | When defining token transaction functions | Complete transaction function template with validation |
+| Chart Initialization | When creating new Chart.js instances | Full Chart.js configuration with styles matching our theme |
+| Event Listener | When adding event listeners | Complete event handler template |
+| API Fetch | When making fetch calls | Complete API call with proper error handling |
+| Notification | When showing notifications | Notification with type parameter |
+| Wallet Connection | When connecting wallets | Complete wallet connection flow with error handling |
+
+## Lint Rules
+
+These custom rules detect potential bugs and issues:
+
+| Rule Name | What It Detects | Why It Matters |
+|-----------|----------------|----------------|
+| Missing Error Handling | Unwrapped Results and unhandled Promises | Prevents application crashes from unhandled errors |
+| Hardcoded Addresses | Direct use of blockchain addresses | Encourages using constants for maintainability |
+| Console Logs | Use of console.log | Reminds to use proper logging for production |
+| TODO Comments | Todo items in code | Keeps track of pending work |
+| Potential Memory Leak | Event listeners without removal | Prevents memory leaks in long-running applications |
+| Mutex Lock Without Release | Mutex locks that may not be released | Prevents deadlocks in Rust code |
+| Magic Numbers | Unnamed numeric constants | Improves code readability and maintainability |
+| Timeout Without Clear | Timeouts without cleanup | Prevents memory leaks from orphaned timeouts |
+| Direct DOM Manipulation | Unsafe innerHTML usage | Prevents potential XSS vulnerabilities |
+
+## Semantic Settings
+
+The semantic settings optimize how Cursor processes our codebase:
+
+- **prioritize_nearby_files**: Gives higher relevance to files likely related to current work
+- **quick_suggestions_on_partial_lines**: Provides suggestions earlier in the typing process
+- **nearby_files_multiplier**: Increases importance of related files by 2x
+- **workspace_exclusions**: Excludes irrelevant directories to improve performance
+
+## Benefits
+
+These Cursor rules provide several benefits:
+
+1. **Faster Development**: Intelligent code completions specific to our project
+2. **Fewer Bugs**: Early detection of common issues in blockchain and async code
+3. **Consistent Code Style**: Snippets enforce best practices
+4. **Lower Cognitive Load**: Less time spent remembering complex API patterns
+5. **Better Error Handling**: Prevents common pitfalls in Rust and JavaScript
+
+## Tips for Best Results
+
+1. Use the snippets when possible for consistent implementation
+2. Pay attention to lint warnings to catch potential issues early
+3. Keep the settings file updated as the project evolves with new patterns
+4. Take advantage of semantic suggestions for better context-aware completions 

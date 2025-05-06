@@ -1,0 +1,259 @@
+/* Dashboard Stats Fix for Wolf63x Solana Sniper Bot - Enhanced UI */
+
+/* Main container */
+#context-stats {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 1.2rem !important;
+    width: 100% !important;
+    padding: 1rem 1.2rem !important;
+    background: linear-gradient(to right, rgba(23, 27, 33, 0.9), rgba(15, 17, 21, 0.8)) !important;
+    border-radius: 12px !important;
+    margin: 0.8rem 0 1.2rem 0 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(20, 241, 149, 0.12) !important;
+    backdrop-filter: blur(16px) !important;
+}
+
+/* Glass effect for container */
+#context-stats::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(135deg, rgba(20, 241, 149, 0.03) 0%, transparent 80%) !important;
+    border-radius: 12px !important;
+    z-index: -1 !important;
+}
+
+/* Stats title styling */
+#stats-title {
+    color: #14F195 !important;
+    font-weight: 700 !important;
+    margin-right: 1.2rem !important;
+    white-space: nowrap !important;
+    font-size: 1.05rem !important;
+    letter-spacing: 0.5px !important;
+    text-shadow: 0 0 12px rgba(20, 241, 149, 0.4) !important;
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+#stats-title::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -4px !important;
+    left: 0 !important;
+    width: 24px !important;
+    height: 2px !important;
+    background: linear-gradient(to right, #14F195, transparent) !important;
+    border-radius: 2px !important;
+}
+
+/* Individual stat items */
+.stat-display {
+    display: inline-flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    margin: 0 0.8rem 0 0 !important;
+    padding: 0.6rem 0.8rem !important;
+    background-color: rgba(29, 35, 42, 0.5) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.stat-display::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), transparent) !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+}
+
+.stat-display:hover {
+    background-color: rgba(31, 38, 46, 0.7) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+    border-color: rgba(20, 241, 149, 0.1) !important;
+}
+
+/* Labels in stats */
+.stat-display .stat-label {
+    margin-right: 0.6rem !important;
+    color: rgba(248, 249, 250, 0.75) !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Values in stats */
+.stat-display .stat-value {
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    color: #F8F9FA !important;
+    letter-spacing: 0.3px !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Positive values */
+.stat-display .stat-value.positive {
+    color: #14F195 !important;
+    text-shadow: 0 0 10px rgba(20, 241, 149, 0.3) !important;
+}
+
+/* Negative values */
+.stat-display .stat-value.negative {
+    color: #FF5C79 !important;
+    text-shadow: 0 0 10px rgba(255, 92, 121, 0.3) !important;
+}
+
+/* Active status indicator */
+.stat-display .stat-value.status-active {
+    color: #14F195 !important;
+    font-weight: 700 !important;
+    padding: 0.15rem 0.4rem !important;
+    background-color: rgba(20, 241, 149, 0.1) !important;
+    border-radius: 4px !important;
+}
+
+/* Inactive status indicator */
+.stat-display .stat-value.status-inactive {
+    color: #FF5C79 !important;
+    font-weight: 700 !important;
+    padding: 0.15rem 0.4rem !important;
+    background-color: rgba(255, 92, 121, 0.1) !important;
+    border-radius: 4px !important;
+}
+
+/* Divider between stat groups */
+.stat-divider {
+    width: 1px !important;
+    height: 24px !important;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.01)) !important;
+    margin: 0 0.8rem !important;
+}
+
+/* Current time display */
+#current-time {
+    margin-left: auto !important;
+    color: rgba(248, 249, 250, 0.5) !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    background-color: rgba(23, 27, 33, 0.5) !important;
+    padding: 0.3rem 0.6rem !important;
+    border-radius: 8px !important;
+    letter-spacing: 0.5px !important;
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Fix for stat container in dashboard */
+.dashboard-stats {
+    margin-top: 1.2rem !important;
+    margin-bottom: 1.2rem !important;
+    width: 100% !important;
+}
+
+/* Clickable items in stats */
+.stat-value.clickable {
+    cursor: pointer !important;
+    text-decoration: none !important;
+    color: #14F195 !important;
+    transition: all 0.2s !important;
+    position: relative !important;
+    padding: 0.15rem 0.4rem !important;
+    border-radius: 4px !important;
+    background-color: rgba(20, 241, 149, 0.1) !important;
+}
+
+.stat-value.clickable:hover {
+    background-color: rgba(20, 241, 149, 0.15) !important;
+    box-shadow: 0 0 10px rgba(20, 241, 149, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+.stat-value.clickable:active {
+    transform: scale(0.98) !important;
+}
+
+/* Fix for FontAwesome coin icon */
+.stat-display .fas.fa-coins {
+    color: #14F195 !important;
+    font-size: 16px !important;
+    vertical-align: middle !important;
+    margin-right: 8px !important;
+    filter: drop-shadow(0 0 6px rgba(20, 241, 149, 0.5)) !important;
+}
+
+/* Ensure the sol-price text is aligned */
+#sol-price {
+    display: inline-block !important;
+    vertical-align: middle !important;
+}
+
+/* Fix for nested stats that might still be present */
+.stat-value #context-stats {
+    display: none !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #context-stats {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.8rem !important;
+        padding: 1rem !important;
+    }
+    
+    .stat-display {
+        margin-bottom: 0.4rem !important;
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+    
+    .stat-divider {
+        display: none !important;
+    }
+    
+    #current-time {
+        margin-left: 0 !important;
+        margin-top: 0.4rem !important;
+        align-self: flex-end !important;
+    }
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.status-active {
+    animation: pulse 2s infinite !important;
+}
+
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+    100% { transform: translateY(0); }
+}
+
+.stat-value.clickable {
+    animation: float 3s ease-in-out infinite !important;
+} 

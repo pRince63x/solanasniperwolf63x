@@ -1,0 +1,414 @@
+# Additional UI enhancements for a more modern look
+
+# Read the current file content
+$content = Get-Content -Path index.html -Raw
+
+# Add a modern glassmorphism effect to cards
+$additionalStyles = @"
+<style>
+/* Modern Glassmorphism Effects */
+.glass-card {
+    background: rgba(20, 20, 35, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(153, 69, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.glass-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(153, 69, 255, 0.3);
+    transform: translateY(-5px);
+    border-color: rgba(153, 69, 255, 0.4);
+}
+
+/* Improved Table Styling */
+.modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1.5rem 0;
+}
+
+.modern-table th {
+    background: rgba(153, 69, 255, 0.1);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    border-bottom: 2px solid rgba(153, 69, 255, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+}
+
+.modern-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.modern-table tr:hover td {
+    background: rgba(153, 69, 255, 0.08);
+}
+
+/* Modern Buttons */
+.btn-modern {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-modern:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.btn-modern:hover:before {
+    transform: translateX(100%);
+}
+
+.btn-primary-modern {
+    background: linear-gradient(135deg, #9945FF, #7B3FD5);
+    color: white;
+    box-shadow: 0 4px 12px rgba(153, 69, 255, 0.2);
+}
+
+.btn-primary-modern:hover {
+    box-shadow: 0 6px 16px rgba(153, 69, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-secondary-modern {
+    background: linear-gradient(135deg, #14F195, #0EC982);
+    color: #111;
+    box-shadow: 0 4px 12px rgba(20, 241, 149, 0.2);
+}
+
+.btn-secondary-modern:hover {
+    box-shadow: 0 6px 16px rgba(20, 241, 149, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Improved Dashboard Cards */
+.dashboard-card-modern {
+    position: relative;
+    border-radius: 16px;
+    padding: 24px;
+    background: linear-gradient(145deg, rgba(25, 25, 40, 0.6), rgba(15, 15, 25, 0.8));
+    border: 1px solid rgba(153, 69, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+}
+
+.dashboard-card-modern:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #9945FF, #14F195);
+    border-radius: 4px 4px 0 0;
+}
+
+.dashboard-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25), 0 0 15px rgba(153, 69, 255, 0.2);
+}
+
+.dashboard-card-modern h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-success {
+    background: rgba(20, 241, 149, 0.15);
+    color: #14F195;
+    border: 1px solid rgba(20, 241, 149, 0.3);
+}
+
+.status-warning {
+    background: rgba(255, 184, 0, 0.15);
+    color: #FFB800;
+    border: 1px solid rgba(255, 184, 0, 0.3);
+}
+
+.status-danger {
+    background: rgba(255, 69, 58, 0.15);
+    color: #FF453A;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+/* Improved Loader */
+.loader-modern {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(153, 69, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #9945FF;
+    animation: spin 1s ease-in-out infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Data Visualizations */
+.progress-bar-modern {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-modern .fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(to right, #9945FF, #14F195);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Enhanced Tooltip */
+.tooltip-modern {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-modern .tooltip-content {
+    visibility: hidden;
+    width: 200px;
+    background: rgba(30, 30, 45, 0.95);
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 10px;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(153, 69, 255, 0.2);
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+
+.tooltip-modern:hover .tooltip-content {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(-5px);
+}
+
+/* Notifications */
+.notification-modern {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    background: rgba(25, 25, 40, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    color: white;
+    z-index: 1000;
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-width: 350px;
+    border-left: 4px solid #9945FF;
+}
+
+.notification-modern.show {
+    transform: translateX(0);
+}
+
+.notification-modern.success {
+    border-left-color: #14F195;
+}
+
+.notification-modern.warning {
+    border-left-color: #FFB800;
+}
+
+.notification-modern.error {
+    border-left-color: #FF453A;
+}
+
+.notification-title {
+    font-weight: 700;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notification-message {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Modern Switches */
+.switch-modern {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 26px;
+}
+
+.switch-modern input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-modern .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.switch-modern .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.switch-modern input:checked + .slider {
+    background-color: #9945FF;
+}
+
+.switch-modern input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Stats Card */
+.stat-card-modern {
+    background: rgba(30, 30, 45, 0.6);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(153, 69, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-color: rgba(153, 69, 255, 0.3);
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #9945FF, #14F195);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.stat-change {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-change.positive {
+    color: #14F195;
+}
+
+.stat-change.negative {
+    color: #FF453A;
+}
+
+/* Modern Charts */
+.chart-container-modern {
+    background: rgba(20, 20, 35, 0.6);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(153, 69, 255, 0.2);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.chart-container-modern:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 0 10px rgba(153, 69, 255, 0.1);
+    transform: translateY(-3px);
+}
+</style>
+"@
+
+# Add the styles to the head section of index.html
+$content = $content -replace '</head>', "$additionalStyles</head>"
+
+# Convert trades-table and scanner-table to modern-table
+$content = $content -replace 'class="trades-table"', 'class="trades-table modern-table"'
+$content = $content -replace 'class="scanner-table"', 'class="scanner-table modern-table"'
+
+# Convert some buttons to modern buttons
+$content = $content -replace 'class="btn btn-primary"', 'class="btn btn-primary btn-modern btn-primary-modern"'
+$content = $content -replace 'class="btn-secondary"', 'class="btn-secondary btn-modern btn-secondary-modern"'
+
+# Convert dashboard cards to modern cards
+$content = $content -replace 'class="dashboard-card"', 'class="dashboard-card dashboard-card-modern"'
+
+# Save the enhanced file
+$content | Set-Content -Path index.html
+
+Write-Host "Additional UI enhancements applied successfully." 

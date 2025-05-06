@@ -1,0 +1,39 @@
+# Final cleanup script
+
+# Read the file content
+$content = Get-Content -Path index.html -Raw
+
+# Replace theme-green with theme-violet for body class
+$content = $content -replace '<body class="theme-green">', '<body class="theme-violet">'
+
+# Remove account-info CSS classes in the inline styles of index.html
+$content = $content -replace '(?s)\.account-info\s*\{[^}]*\}', ''
+
+# Save the changes
+$content | Set-Content -Path index.html
+
+Write-Host "Successfully changed theme-green to theme-violet and removed account-info styles from index.html."
+
+# Now let's clean the styles.css file to remove account-info CSS
+$cssFiles = @("styles.css", "modern-sidebar.css")
+
+foreach ($cssFile in $cssFiles) {
+    if (Test-Path $cssFile) {
+        $cssContent = Get-Content -Path $cssFile -Raw
+        
+        # Remove account-info CSS sections from modern-sidebar.css
+        if ($cssFile -eq "modern-sidebar.css") {
+            $cssContent = $cssContent -replace '(?s)/\* Account info section at bottom \*/[\s\S]*?/\* Responsive design for sidebar \*/', '/* Responsive design for sidebar */'
+        }
+        
+        # Remove account-info CSS classes from all CSS files
+        $cssContent = $cssContent -replace '(?s)\.account-info[\s\S]*?}', ''
+        
+        # Save the modified CSS
+        $cssContent | Set-Content -Path $cssFile
+        
+        Write-Host "Removed account-info CSS styles from $cssFile"
+    }
+}
+
+Write-Host "Final cleanup completed successfully!" 

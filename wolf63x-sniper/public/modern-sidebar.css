@@ -1,0 +1,356 @@
+/* Modern Sidebar Styles - Enhanced Dashboard Design */
+
+:root {
+    --sidebar-bg: #101116;
+    --sidebar-active-bg: rgba(20, 241, 149, 0.1);
+    --sidebar-active-indicator: #14F195; 
+    --sidebar-text: rgba(255, 255, 255, 0.8);
+    --sidebar-icon: rgba(255, 255, 255, 0.7);
+    --sidebar-active-text: #14F195;
+    --sidebar-width-collapsed: 50px;
+    --sidebar-width-expanded: 180px;
+    --sidebar-transition-speed: 0.3s;
+    --sidebar-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 80px;
+    background-color: rgba(30, 30, 35, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 900;
+    padding-top: 75px; /* Space for the top bar */
+    transition: all 0.3s ease;
+}
+
+/* Custom scrollbar for webkit browsers */
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(16, 17, 22, 0.3);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(20, 241, 149, 0.3);
+    border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(20, 241, 149, 0.5);
+}
+
+.sidebar.expanded {
+    width: 240px;
+}
+
+/* Main content positioning */
+.main-content {
+    margin-left: 80px;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content.sidebar-expanded {
+    margin-left: 240px;
+}
+
+/* Add blur effect when account popup is shown */
+.main-content.blur-background {
+    filter: blur(5px);
+    pointer-events: none; /* Prevents clicking through the blur */
+}
+
+/* Sidebar header and logo styles */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.75rem;
+    margin-bottom: 1.5rem;
+    position: sticky;
+    top: 0;
+    background-color: var(--sidebar-bg);
+    z-index: 2;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-logo img {
+    width: 28px;
+    height: 28px;
+    transition: all var(--sidebar-transition-speed) ease;
+}
+
+.sidebar-logo-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--sidebar-text);
+    margin-left: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all var(--sidebar-transition-speed) ease;
+}
+
+.sidebar.expanded .sidebar-logo-text {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle {
+    position: absolute;
+    top: 1.25rem;
+    right: -10px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--sidebar-bg);
+    border: 1px solid rgba(20, 241, 149, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 60;
+    color: var(--sidebar-active-text);
+    font-size: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: all var(--sidebar-transition-speed) ease;
+}
+
+.sidebar-toggle:hover {
+    background-color: rgba(20, 241, 149, 0.1);
+    transform: scale(1.1);
+}
+
+.sidebar.expanded .sidebar-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Navigation items */
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0 0.4rem;
+    flex-grow: 0.7; /* Reduced from 1 to make room for account-info */
+    overflow-y: auto; /* Allow scrolling for navigation items */
+    max-height: calc(100vh - 250px); /* Set max height instead of fixed height */
+    width: 95%; /* Reduce width */
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.65rem 0.85rem;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.nav-item:hover {
+    background-color: var(--sidebar-active-bg);
+    color: var(--sidebar-active-text);
+}
+
+.nav-item.active {
+    background-color: var(--sidebar-active-bg);
+    color: var(--sidebar-active-text);
+    position: relative;
+}
+
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 70%;
+    background-color: var(--sidebar-active-indicator);
+    left: 0;
+    top: 15%;
+    border-radius: 0 2px 2px 0;
+}
+
+.nav-icon {
+    font-size: 1rem;
+    color: var(--sidebar-icon);
+    width: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.nav-item:hover .nav-icon,
+.nav-item.active .nav-icon {
+    color: var(--sidebar-active-text);
+}
+
+.nav-text {
+    margin-left: 10px;
+    font-size: 0.75rem;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all var(--sidebar-transition-speed) ease;
+    letter-spacing: 0.02em;
+}
+
+.sidebar.expanded .nav-text {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Responsive design for sidebar */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        border-right: none;
+    }
+    
+    .sidebar.expanded {
+        width: var(--sidebar-width-expanded);
+        border-right: 1px solid rgba(153, 69, 255, 0.1);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .main-content.sidebar-expanded {
+        margin-left: 0;
+    }
+}
+
+/* Mobile overlay */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    display: none;
+    backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* Mobile menu button */
+.menu-button {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    width: 36px;
+    height: 36px;
+    background-color: var(--sidebar-bg);
+    border: 1px solid rgba(20, 241, 149, 0.3);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 60;
+    color: var(--sidebar-active-text);
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    .menu-button {
+        display: flex;
+    }
+}
+
+/* Removed Account Detail Popup styles */
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Chart animations and interactions */
+.portfolio-chart-container {
+    transition: all 0.3s ease;
+}
+
+.portfolio-chart-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15), 0 0 5px rgba(20, 241, 149, 0.2);
+}
+
+/* Make sure we have proper scrolling for the trades section */
+.account-detail-body .performance-trades-container .account-section {
+    max-height: 450px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(20, 241, 149, 0.3) rgba(16, 17, 22, 0.3);
+}
+
+.account-detail-body .performance-trades-container .account-section::-webkit-scrollbar {
+    width: 4px;
+}
+
+.account-detail-body .performance-trades-container .account-section::-webkit-scrollbar-track {
+    background: rgba(16, 17, 22, 0.3);
+}
+
+.account-detail-body .performance-trades-container .account-section::-webkit-scrollbar-thumb {
+    background-color: rgba(20, 241, 149, 0.3);
+    border-radius: 4px;
+}
+
+/* Enhance section hover effects */
+.account-section.hover-glow:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 0 10px rgba(20, 241, 149, 0.3);
+}
+
+/* Match background colors between chart and trades sections */
+.performance-trades-container .account-section {
+    background-color: rgba(16, 17, 22, 0.7) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(20, 241, 149, 0.15);
+}
+
+.portfolio-chart-container {
+    background: rgba(16, 17, 22, 0.3);
+    border: 1px solid rgba(20, 241, 149, 0.1);
+}
+
+/* Sync indicator styles */
+.sync-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 4px 8px;
+    background: rgba(20, 241, 149, 0.1);
+    border-radius: 4px;
+    margin-left: auto;
+    margin-right: 5px;
+    animation: pulse-sync 2s infinite alternate;
+}
+
+.sync-indicator i {
+    color: #14F195;
+    font-size: 0.7rem;
+}
+
+@keyframes pulse-sync {
+    0% { background: rgba(20, 241, 149, 0.05); }
+    100% { background: rgba(20, 241, 149, 0.15); }
+} 
+

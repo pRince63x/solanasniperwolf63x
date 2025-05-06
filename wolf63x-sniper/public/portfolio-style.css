@@ -1,0 +1,182 @@
+/* Portfolio Page Styling */
+.portfolio-container {
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: var(--bg-dark-elevated);
+}
+
+.portfolio-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.portfolio-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.portfolio-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.portfolio-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  flex: 1 1 200px;
+  background-color: var(--bg-dark);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.summary-title {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.summary-value.positive {
+  color: var(--success);
+}
+
+.summary-value.negative {
+  color: var(--danger);
+}
+
+.portfolio-assets, .portfolio-nfts {
+  margin-bottom: 1.5rem;
+}
+
+.portfolio-assets h3, .portfolio-nfts h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.assets-table-container {
+  overflow-x: auto;
+}
+
+.assets-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.assets-table th, .assets-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.assets-table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--bg-dark);
+}
+
+.nfts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+/* Make all stats sections consistent */
+.context-stats {
+  width: 100% !important;
+  background-color: var(--bg-dark-elevated) !important;
+  border-radius: 8px !important;
+  padding: 8px 15px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.stats-info-inline {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  height: 40px !important;
+}
+
+#stats-title, 
+#sniper-stats-title, 
+#scanner-stats-title, 
+#pairs-stats-title,
+#portfolio-stats-title,
+#history-stats-title,
+#settings-stats-title {
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  margin-right: 15px !important;
+}
+
+.stat-display {
+  display: flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+}
+
+.stat-label {
+  color: var(--text-secondary) !important;
+  margin-right: 5px !important;
+  font-size: 0.9em !important;
+}
+
+.stat-value {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+}
+
+.stat-value.positive {
+  color: var(--success) !important;
+}
+
+.stat-value.negative {
+  color: var(--danger) !important;
+}
+
+.stat-value.status-active {
+  color: var(--success) !important;
+}
+
+.stat-divider {
+  width: 1px !important;
+  height: 20px !important;
+  background-color: var(--border) !important;
+  margin: 0 5px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .stats-info-inline {
+    justify-content: center !important;
+  }
+  
+  #stats-title, 
+  #sniper-stats-title, 
+  #scanner-stats-title, 
+  #pairs-stats-title,
+  #portfolio-stats-title,
+  #history-stats-title,
+  #settings-stats-title {
+    width: 100% !important;
+    text-align: center !important;
+    margin-bottom: 5px !important;
+  }
+}

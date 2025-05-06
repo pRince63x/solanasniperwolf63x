@@ -1,0 +1,217 @@
+# Script to enhance UI and remove theme-green class
+
+# Create a backup of the index.html file
+Copy-Item -Path index.html -Destination index.html.backup.ui -Force
+
+# Read the content of the file
+$content = Get-Content -Path index.html -Raw
+
+# Replace theme-green class with theme-violet for a sleeker look
+$content = $content -replace 'class="theme-green"', 'class="theme-violet"'
+
+# Enhance UI elements
+# 1. Improve button styles with more modern gradients
+$content = $content -replace '\.btn-primary \{[^}]*\}', '.btn-primary {
+    background: linear-gradient(135deg, #9945FF, #8752F3);
+    color: white;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(153, 69, 255, 0.2);
+    transition: all 0.3s ease;
+}'
+
+# 2. Improve hover effects
+$content = $content -replace '\.btn-primary:hover \{[^}]*\}', '.btn-primary:hover {
+    background: linear-gradient(135deg, #8752F3, #9945FF);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(153, 69, 255, 0.3);
+}'
+
+# 3. Enhance card designs
+$content = $content -replace '\.card \{[^}]*\}', '.card {
+    background: rgba(30, 30, 38, 0.8);
+    border-radius: 12px;
+    border: 1px solid rgba(153, 69, 255, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}'
+
+# 4. Add hover effect for cards
+$content = $content -replace '\.card:hover \{[^}]*\}', '.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2), 0 0 15px rgba(153, 69, 255, 0.2);
+    border-color: rgba(153, 69, 255, 0.3);
+}'
+
+# 5. Enhance header styles
+$content = $content -replace '\.dashboard-header h2 \{[^}]*\}', '.dashboard-header h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    background: linear-gradient(to right, #9945FF, #14F195);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 2px 10px rgba(153, 69, 255, 0.1);
+}'
+
+# 6. Improve chart styles
+$content = $content -replace '\.chart-container \{[^}]*\}', '.chart-container {
+    background: rgba(25, 25, 35, 0.5);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(153, 69, 255, 0.1);
+}'
+
+# 7. Enhance table styles
+$content = $content -replace '\.trades-table, \.scanner-table \{[^}]*\}', '.trades-table, .scanner-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    margin-top: 1rem;
+}'
+
+$content = $content -replace '\.trades-table tr:hover, \.scanner-table tr:hover \{[^}]*\}', '.trades-table tr:hover, .scanner-table tr:hover {
+    background-color: rgba(153, 69, 255, 0.1);
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}'
+
+# 8. Improve input styles
+$content = $content -replace 'input, select, textarea \{[^}]*\}', 'input, select, textarea {
+    background: rgba(30, 30, 38, 0.6);
+    border: 1px solid rgba(153, 69, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}'
+
+$content = $content -replace 'input:focus, select:focus, textarea:focus \{[^}]*\}', 'input:focus, select:focus, textarea:focus {
+    border-color: rgba(153, 69, 255, 0.6);
+    box-shadow: 0 0 0 3px rgba(153, 69, 255, 0.1);
+    outline: none;
+}'
+
+# 9. Add subtle animations
+$content += @"
+
+/* Additional UI Enhancements */
+.card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dashboard-stat {
+    transition: all 0.3s ease;
+}
+
+.dashboard-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 0 8px rgba(153, 69, 255, 0.2);
+}
+
+.nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(to right, #9945FF, #14F195);
+    transition: width 0.3s ease;
+}
+
+.nav-item:hover::after {
+    width: 100%;
+}
+
+.sidebar .nav-item.active::after {
+    width: 100%;
+}
+
+/* Improve scrollbar appearance */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(30, 30, 38, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(153, 69, 255, 0.5);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(153, 69, 255, 0.7);
+}
+
+/* Add subtle pulse effect to action buttons */
+.action-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: inherit;
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.action-btn:hover::before {
+    transform: scale(1.5);
+    opacity: 0;
+    animation: pulse-effect 1.5s infinite;
+}
+
+@keyframes pulse-effect {
+    0% { transform: scale(0); opacity: 0.5; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+"@
+
+# Save the modified content to the file
+$content | Set-Content -Path index.html
+
+# Remove unwanted HTML files
+$filesToRemove = @(
+    "index.html.new",
+    "index.html.final",
+    "index.html.clean",
+    "index.html.fixed",
+    "index1.html",
+    "index.html.backup",
+    "index.html.bak"
+)
+
+foreach ($file in $filesToRemove) {
+    if (Test-Path $file) {
+        Remove-Item $file -Force
+        Write-Host "Removed $file"
+    }
+}
+
+Write-Host "UI enhanced and theme-green class removed successfully."
+Write-Host "Unwanted HTML files have been cleaned up." 

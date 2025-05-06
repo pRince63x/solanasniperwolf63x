@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 100">
+  <defs>
+    <!-- Gradient for the wolf -->
+    <linearGradient id="wolfGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#30D158;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00B37E;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <!-- Text gradient -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#CCCCCC;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Wolf in crosshairs logo - premium version -->
+  <g filter="url(#glow)">
+    <!-- Crosshair circle -->
+    <circle cx="50" cy="50" r="35" fill="none" stroke="url(#wolfGradient)" stroke-width="4" stroke-dasharray="1, 0"/>
+    
+    <!-- Crosshair lines -->
+    <path d="M50,15 L50,30" stroke="url(#wolfGradient)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M50,70 L50,85" stroke="url(#wolfGradient)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M15,50 L30,50" stroke="url(#wolfGradient)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M70,50 L85,50" stroke="url(#wolfGradient)" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- Wolf head silhouette -->
+    <path d="M65,40 C70,30 60,25 55,30 C50,25 45,25 40,30 C35,28 30,35 35,40 C30,45 35,55 40,55 C45,60 55,60 60,55 C65,60 70,55 70,50 C75,45 70,45 65,40Z" fill="url(#wolfGradient)"/>
+    
+    <!-- Wolf eye -->
+    <circle cx="52" cy="42" r="2" fill="#FFFFFF"/>
+  </g>
+  
+  <!-- Text "WOLF63x" with premium styling -->
+  <text x="100" y="60" font-family="'Segoe UI', Arial, sans-serif" font-weight="bold" font-size="42" fill="url(#textGradient)" filter="url(#glow)">WOLF63x</text>
+  
+  <!-- Text "SNIPER" with accent color -->
+  <text x="270" y="60" font-family="'Segoe UI', Arial, sans-serif" font-weight="bold" font-size="42" fill="url(#wolfGradient)" filter="url(#glow)">SNIPER</text>
+  
+  <!-- Small candlestick chart -->
+  <g transform="translate(450, 45) scale(0.5, 0.5)">
+    <!-- Green and red candlesticks -->
+    <line x1="10" y1="0" x2="10" y2="30" stroke="#30D158" stroke-width="3"/>
+    <rect x="5" y="5" width="10" height="20" fill="#30D158"/>
+    
+    <line x1="25" y1="-10" x2="25" y2="20" stroke="#FF453A" stroke-width="3"/>
+    <rect x="20" y="-10" width="10" height="20" fill="#FF453A"/>
+    
+    <line x1="40" y1="5" x2="40" y2="35" stroke="#30D158" stroke-width="3"/>
+    <rect x="35" y="10" width="10" height="20" fill="#30D158"/>
+    
+    <line x1="55" y1="-5" x2="55" y2="25" stroke="#FF453A" stroke-width="3"/>
+    <rect x="50" y="-5" width="10" height="20" fill="#FF453A"/>
+    
+    <line x1="70" y1="-15" x2="70" y2="15" stroke="#30D158" stroke-width="3"/>
+    <rect x="65" y="-10" width="10" height="20" fill="#30D158"/>
+    
+    <line x1="85" y1="0" x2="85" y2="30" stroke="#30D158" stroke-width="3"/>
+    <rect x="80" y="5" width="10" height="20" fill="#30D158"/>
+  </g>
+</svg>

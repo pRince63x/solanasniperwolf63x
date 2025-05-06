@@ -1,0 +1,17 @@
+# Final cleanup script to remove any remaining account popup references
+
+# Read the index.html file
+$content = Get-Content -Path index.html -Raw
+
+# Remove popup-overlay account-popup-overlay and account-detail-popup
+$content = $content -replace '(?s)<div class="popup-overlay account-popup-overlay">.*?</div>', ''
+$content = $content -replace '(?s)<div class="popup-base account-detail-popup">.*?</div>', ''
+
+# Remove any remaining account-detail-content sections with escaped quotes
+$content = $content -replace '(?s)\\n <div class=\\account-detail.*?</div>', ''
+$content = $content -replace '(?s)<div class=\\account-detail.*?</div>', ''
+
+# Save the cleaned file
+$content | Set-Content -Path index.html
+
+Write-Host "Final cleanup of account popup references completed" 

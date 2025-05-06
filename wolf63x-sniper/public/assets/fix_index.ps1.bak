@@ -1,0 +1,42 @@
+# PowerShell script to clean index.html file
+# Remove account info section and popup functionality
+
+# Create a backup of the original file if it doesn't exist
+if (-not (Test-Path -Path index.html.original)) {
+    Copy-Item -Path index.html -Destination index.html.original -Force
+}
+
+# Get the content of the original file
+$originalContent = Get-Content -Path index.html -Raw
+
+# Extract the first complete HTML document
+if ($originalContent -match '(?s)<\!DOCTYPE html>.*?<\/html>') {
+    $htmlContent = $matches[0]
+    Write-Host "Extracted HTML content successfully"
+} else {
+    Write-Host "Failed to extract HTML content"
+    exit
+}
+
+# Remove the account-info section from the sidebar
+$htmlContent = $htmlContent -replace '(?s)<div class="account-info">.*?</div>\s*</aside>', '</aside>'
+
+# Remove the account detail popup and its overlay
+$htmlContent = $htmlContent -replace '(?s)<div class="popup-overlay" id="popupOverlay"></div>[\s\r\n]*<div class="account-detail-popup" id="accountDetailPopup">.*?</div>', ''
+
+# Remove account-related script imports
+$htmlContent = $htmlContent -replace '<script src="account-popup.js"></script>', ''
+$htmlContent = $htmlContent -replace '<script src="account-popup-fix.js"></script>', ''
+$htmlContent = $htmlContent -replace '<script src="account-detail.js"></script>', ''
+$htmlContent = $htmlContent -replace '<script src="js/account-detail.js"></script>', ''
+
+# Remove the account popup initialization script in the head
+$htmlContent = $htmlContent -replace '(?s)<script>\s*document\.addEventListener\(''DOMContentLoaded'', function\(\) \{\s*var popup = document\.getElementById\(''accountDetailPopup''\);\s*var overlay = document\.getElementById\(''popupOverlay''\);\s*if\(popup && overlay\) \{\s*popup\.classList\.remove\(''show''\);\s*overlay\.classList\.remove\(''show''\);\s*popup\.style\.display = ''none'';\s*overlay\.style\.display = ''none'';\s*\}\s*\}\);\s*</script>', ''
+
+# Write the cleaned content to a new file
+$htmlContent | Set-Content -Path index.html.new
+
+# Replace the original file with the clean one
+Copy-Item -Path index.html.new -Destination index.html -Force
+
+Write-Host "Account info section and popup have been removed from index.html" 

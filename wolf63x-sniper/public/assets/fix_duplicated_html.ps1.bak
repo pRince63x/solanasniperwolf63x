@@ -1,0 +1,40 @@
+# Script to fix duplicate HTML issues in index.html
+
+# Create a backup
+Copy-Item -Path index.html -Destination index.html.before_cleanup -Force
+
+# Read the index.html content
+$content = Get-Content -Path index.html -Raw
+
+# Extract the first complete HTML document
+if ($content -match '(?s)<\!DOCTYPE html>.*?</html>') {
+    $firstHtmlDocument = $matches[0]
+    
+    # Save only the first complete HTML document
+    $firstHtmlDocument | Set-Content -Path index.html.clean
+    
+    # Replace the original file
+    Copy-Item -Path index.html.clean -Destination index.html -Force
+    
+    Write-Host "Successfully fixed any duplicated HTML content."
+    
+    # Clean up temporary file
+    Remove-Item -Path index.html.clean -Force
+} else {
+    Write-Host "Failed to extract HTML document."
+}
+
+# Remove remaining account-info references in JS init code
+$content = Get-Content -Path index.html -Raw
+$content = $content -replace '(?s)<script>\s*document\.addEventListener\(''DOMContentLoaded'', function\(\) \{\s*var popup = document\.getElementById\(''accountDetailPopup''\);\s*var overlay = document\.getElementById\(''popupOverlay''\);\s*.*?\}\);\s*</script>', ''
+$content | Set-Content -Path index.html
+
+# Final cleanup - remove any script tags referencing account popups
+$content = Get-Content -Path index.html -Raw
+$content = $content -replace '<script src="account-popup.js"></script>', ''
+$content = $content -replace '<script src="account-popup-fix.js"></script>', ''
+$content = $content -replace '<script src="account-detail.js"></script>', ''
+$content = $content -replace '<script src="js/account-detail.js"></script>', ''
+$content | Set-Content -Path index.html
+
+Write-Host "Duplicate HTML and account popup references removed successfully." 

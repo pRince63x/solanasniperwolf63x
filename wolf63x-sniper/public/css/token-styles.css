@@ -1,0 +1,189 @@
+/* Token Row Styles for Wolf63x Sniper Bot */
+
+.trending-tokens {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.token-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(23, 27, 33, 0.6);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    transition: all 0.25s ease;
+}
+
+.token-row:hover {
+    transform: translateY(-2px);
+    background: rgba(29, 35, 42, 0.7);
+    border-color: rgba(20, 241, 149, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.token-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.token-mini-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(20, 241, 149, 0.2);
+}
+
+.token-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.token-symbol {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-left: 4px;
+}
+
+.token-price {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.token-change {
+    font-weight: 600;
+    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    width: 70px;
+    text-align: center;
+}
+
+.token-change.positive {
+    color: #14F195;
+    background: rgba(20, 241, 149, 0.08);
+}
+
+.token-change.negative {
+    color: #FF5C79;
+    background: rgba(255, 92, 121, 0.08);
+}
+
+.token-volume {
+    font-size: 13px;
+    color: var(--text-secondary);
+    width: 70px;
+    text-align: right;
+}
+
+/* Enhanced table styles */
+.trades-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.trades-table th {
+    text-align: left;
+    padding: 14px 16px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.trades-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    font-size: 14px;
+}
+
+.trades-table tr {
+    transition: all 0.2s ease;
+}
+
+.trades-table tr:hover {
+    background-color: rgba(29, 35, 42, 0.3);
+}
+
+.trades-table tr:last-child td {
+    border-bottom: none;
+}
+
+.token-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.token-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(20, 241, 149, 0.2);
+    padding: 0;
+    box-shadow: 0 0 8px rgba(20, 241, 149, 0.15);
+}
+
+.profit-cell {
+    font-weight: 600;
+}
+
+.profit-cell.positive {
+    color: #14F195;
+}
+
+.profit-cell.negative {
+    color: #FF5C79;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .token-row {
+        padding: 10px 12px;
+    }
+    
+    .token-volume {
+        display: none;
+    }
+    
+    .trades-table th, 
+    .trades-table td {
+        padding: 12px 8px;
+    }
+    
+    .trades-table th:nth-child(2),
+    .trades-table td:nth-child(2) {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .token-row {
+        flex-wrap: wrap;
+    }
+    
+    .token-price {
+        margin-left: auto;
+    }
+    
+    .token-change {
+        width: 100%;
+        text-align: left;
+        margin-top: 8px;
+    }
+    
+    .trades-table th:nth-child(5),
+    .trades-table td:nth-child(5) {
+        display: none;
+    }
+} 

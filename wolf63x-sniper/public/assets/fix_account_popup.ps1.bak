@@ -1,0 +1,31 @@
+# PowerShell script to clean index.html file
+# Remove account info section and popup functionality
+
+# Create a backup of the original file
+Copy-Item -Path index.html -Destination index.html.original -Force
+
+# Step 1: Read the file content
+$content = Get-Content -Path index.html -Raw
+
+# Step 2: Remove the account-info section from the sidebar
+$content = $content -replace '(?s)<div class="account-info">.*?</div>\s*</aside>', '</aside>'
+
+# Step 3: Remove the account detail popup and its overlay
+$content = $content -replace '(?s)<div class="popup-overlay" id="popupOverlay"></div>[\s\r\n]*<div class="account-detail-popup" id="accountDetailPopup">.*?</div>', ''
+
+# Step 4: Remove account-related script imports
+$content = $content -replace '<script src="account-popup.js"></script>', ''
+$content = $content -replace '<script src="account-popup-fix.js"></script>', ''
+$content = $content -replace '<script src="account-detail.js"></script>', ''
+$content = $content -replace '<script src="js/account-detail.js"></script>', ''
+
+# Step 5: Remove the account popup initialization script in the head
+$content = $content -replace '(?s)<script>\s*document\.addEventListener\(''DOMContentLoaded'', function\(\) \{\s*var popup = document\.getElementById\(''accountDetailPopup''\);\s*var overlay = document\.getElementById\(''popupOverlay''\);\s*if\(popup && overlay\) \{\s*popup\.classList\.remove\(''show''\);\s*overlay\.classList\.remove\(''show''\);\s*popup\.style\.display = ''none'';\s*overlay\.style\.display = ''none'';\s*\}\s*\}\);\s*</script>', ''
+
+# Step 6: Write the cleaned content to a new file
+$content | Set-Content -Path index.html.clean.new
+
+# Step 7: Replace the original file with the clean one
+Copy-Item -Path index.html.clean.new -Destination index.html -Force
+
+Write-Host "Account info section and popup have been removed from index.html" 

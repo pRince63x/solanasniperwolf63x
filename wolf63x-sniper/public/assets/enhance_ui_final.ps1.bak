@@ -1,0 +1,307 @@
+# Final UI enhancements and JavaScript improvements
+
+# Read the current file content
+$content = Get-Content -Path index.html -Raw
+
+# Add additional chart animation improvements
+$additionalJS = @"
+<script>
+// Enhanced UI Interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation classes to elements when they come into view
+    const animateOnScroll = function() {
+        const elements = document.querySelectorAll('.card, .dashboard-card, .glass-card, .stat-card-modern');
+        
+        elements.forEach(element => {
+            const elementTop = element.getBoundingClientRect().top;
+            const elementVisible = 150;
+            
+            if (elementTop < window.innerHeight - elementVisible) {
+                element.classList.add('animate-in');
+            }
+        });
+    };
+    
+    // Run once on load
+    animateOnScroll();
+    
+    // Listen for scroll events
+    window.addEventListener('scroll', animateOnScroll);
+    
+    // Enhance chart animations
+    const enhanceCharts = function() {
+        // Find all chart canvases
+        const chartCanvases = document.querySelectorAll('canvas');
+        
+        chartCanvases.forEach(canvas => {
+            // Add hover effect to parent container
+            const container = canvas.closest('.chart-container, .chart-container-modern');
+            if (container) {
+                container.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.2), 0 0 15px rgba(153, 69, 255, 0.3)';
+                });
+                
+                container.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                });
+            }
+        });
+    };
+    
+    // Run chart enhancements after a delay to ensure charts are loaded
+    setTimeout(enhanceCharts, 1000);
+    
+    // Add pulse effect to buttons
+    const buttons = document.querySelectorAll('.btn-primary, .btn-secondary, .btn-primary-modern, .btn-secondary-modern');
+    
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // Create ripple effect
+            const circle = document.createElement('div');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            
+            circle.style.width = circle.style.height = `\${diameter}px`;
+            circle.style.left = `\${e.clientX - button.offsetLeft - diameter / 2}px`;
+            circle.style.top = `\${e.clientY - button.offsetTop - diameter / 2}px`;
+            circle.classList.add('ripple');
+            
+            // Remove existing ripples
+            const ripple = button.getElementsByClassName('ripple')[0];
+            if (ripple) {
+                ripple.remove();
+            }
+            
+            button.appendChild(circle);
+        });
+    });
+    
+    // Enhance table interactions
+    const tableRows = document.querySelectorAll('.trades-table tr, .scanner-table tr, .modern-table tr');
+    
+    tableRows.forEach(row => {
+        if (!row.closest('thead')) { // Skip header rows
+            row.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.01)';
+                this.style.backgroundColor = 'rgba(153, 69, 255, 0.1)';
+                this.style.transition = 'all 0.2s ease';
+            });
+            
+            row.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+                this.style.backgroundColor = '';
+            });
+        }
+    });
+    
+    // Add smooth transitions between pages/tabs
+    const tabLinks = document.querySelectorAll('[data-target]');
+    
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('data-target');
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                // Hide all pages
+                document.querySelectorAll('.page, .tab-content').forEach(page => {
+                    page.style.opacity = '0';
+                    setTimeout(() => {
+                        page.classList.remove('active');
+                    }, 300);
+                });
+                
+                // Show target page with animation
+                setTimeout(() => {
+                    targetElement.classList.add('active');
+                    setTimeout(() => {
+                        targetElement.style.opacity = '1';
+                    }, 50);
+                }, 350);
+                
+                // Update active class on links
+                document.querySelectorAll('[data-target]').forEach(item => {
+                    item.classList.remove('active');
+                });
+                this.classList.add('active');
+            }
+        });
+    });
+});
+
+// Add styles for the enhanced effects
+document.head.insertAdjacentHTML('beforeend', `
+<style>
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-in {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+.page, .tab-content {
+    transition: opacity 0.3s ease;
+}
+
+.page:not(.active), .tab-content:not(.active) {
+    display: none;
+}
+
+.page.active, .tab-content.active {
+    display: block;
+}
+
+/* Enhance stat cards */
+.stat-item {
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 0 10px rgba(153, 69, 255, 0.15);
+}
+
+/* Improve form controls */
+input, select, textarea {
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    transform: translateY(-2px);
+}
+
+/* Enhance scrolling experience */
+html {
+    scroll-behavior: smooth;
+}
+</style>
+`);
+</script>
+"@
+
+# Add the additional JavaScript to the file before the closing body tag
+$content = $content -replace '</body>', "$additionalJS</body>"
+
+# Convert some standard cards to glass cards
+$content = $content -replace 'class="card"', 'class="card glass-card"'
+
+# Enhance stat items
+$content = $content -replace 'class="stat-item"', 'class="stat-item stat-card-modern"'
+
+# Convert chart containers
+$content = $content -replace 'class="chart-container"', 'class="chart-container chart-container-modern"'
+
+# Enhance the dashboard content with modern glassmorphism
+$dashboardStyles = @"
+<style>
+/* Modern Dashboard Styles */
+body.theme-violet {
+    background: linear-gradient(135deg, #111222, #1a1528);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Create glassmorphism effect for main content */
+.main-content {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgba(20, 20, 35, 0.3);
+    border-radius: 16px;
+    margin: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(153, 69, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Improve sidebar appearance */
+.sidebar {
+    background: rgba(20, 20, 35, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(153, 69, 255, 0.2);
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Dashboard grid layout improvements */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 15px;
+}
+
+/* Better loading states */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.loading:after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(153, 69, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #9945FF;
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* Improved top bar */
+.top-bar {
+    background: rgba(20, 20, 35, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(153, 69, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+</style>
+"@
+
+# Add the dashboard styles to the head section
+$content = $content -replace '</head>', "$dashboardStyles</head>"
+
+# Save the enhanced file
+$content | Set-Content -Path index.html
+
+Write-Host "Final UI enhancements and JavaScript improvements applied successfully!" 

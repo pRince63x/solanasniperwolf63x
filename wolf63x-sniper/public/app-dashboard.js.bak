@@ -1,0 +1,1430 @@
+/*jshint esversion: 11 */
+/*global SniperApp, Chart */
+
+// Wolf63x Solana Sniper Bot - Dashboard Functionality with Chart and Trades
+
+// Dashboard state variables
+let dashboardChart = null;
+let currentTimeRange = '7d';
+
+// Initialization when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof Chart !== 'undefined') {
+        initializeDashboard();
+    } else {
+        console.error('Chart.js library not loaded');
+        
+        // Try to load Chart.js dynamically
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
+        script.onload = initializeDashboard;
+        script.onerror = () => console.error('Failed to load Chart.js dynamically');
+        document.head.appendChild(script);
+    }
+});
+
+// Main dashboard initialization
+function initializeDashboard() {
+    console.log('Dashboard initialized');
+    
+    // Initialize core components
+    initializeDashboardChart();
+    // Active trades section removed, so we skip these functions
+    // fetchOpenTrades();
+    setupDashboardControls();
+    updateDashboardStats();
+    
+    // If SniperApp is available, connect to it
+    if (window.SniperApp) {
+        console.log('Connecting dashboard to SniperApp');
+        connectToDashboardEvents();
+    }
+}
+
+// Connect to SniperApp events for live updates
+function connectToDashboardEvents() {
+    if (!window.SniperApp) return;
+    
+    // Listen for balance updates
+    window.SniperApp.events.on('balanceUpdated', (balance) => {
+        const walletBalanceElement = document.querySelector('#wallet-balance');
+        if (walletBalanceElement) {
+            walletBalanceElement.textContent = formatCurrency(balance);
+        }
+    });
+    
+    // Active trades removed, so we skip handling the trades events
+    /*
+    // Listen for trade updates
+    window.SniperApp.events.on('tradesUpdated', (trades) => {
+        renderOpenTrades(trades);
+        updateTotalPnl(trades);
+        updateDashboardStats(trades);
+    });
+    */
+    
+    // We still want to update stats when trades are updated
+    window.SniperApp.events.on('tradesUpdated', (trades) => {
+        updateDashboardStats(trades);
+    });
+    
+    // Listen for chart data updates
+    window.SniperApp.events.on('chartDataUpdated', (data) => {
+        updateChartData(data);
+    });
+}
+
+// Set up dashboard controls
+function setupDashboardControls() {
+    // Time range dropdown functionality
+    const timeRangeDropdown = document.querySelector('.time-range-dropdown');
+    if (timeRangeDropdown) {
+        const dropdownToggle = timeRangeDropdown.querySelector('.dropdown-toggle');
+        const dropdownItems = timeRangeDropdown.querySelectorAll('.dropdown-item');
+        
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const selectedRange = this.getAttribute('data-range');
+                currentTimeRange = selectedRange;
+                dropdownToggle.textContent = this.textContent;
+                renderDashboardChart(selectedRange);
+            });
+        });
+    }
+    
+    // Active trades section removed, so we no longer need these event listeners
+    /*
+    // Setup Take All Profits buttons (multiple locations in the UI)
+    const takeAllProfitsBtns = document.querySelectorAll('.take-all-profits-btn, #take-all-profits, .take-profits-btn');
+    takeAllProfitsBtns.forEach(btn => {
+        if (btn) {
+            btn.addEventListener('click', function() {
+                takeAllProfits();
+            });
+        }
+    });
+    
+    // Setup trade filter functionality
+    const tradeFilters = document.querySelectorAll('.trades-filters .filter');
+    if (tradeFilters.length > 0) {
+        tradeFilters.forEach(filter => {
+            filter.addEventListener('click', function() {
+                // Remove active class from all filters
+                tradeFilters.forEach(f => f.classList.remove('active'));
+                
+                // Add active class to clicked filter
+                this.classList.add('active');
+                
+                // Apply filter
+                const filterType = this.getAttribute('data-filter');
+                applyTradeFilter(filterType);
+            });
+        });
+    }
+    
+    // Setup trades-filter dropdown
+    const tradesFilterDropdown = document.querySelector('#trades-filter');
+    if (tradesFilterDropdown) {
+        tradesFilterDropdown.addEventListener('change', function() {
+            applyTradeFilter(this.value);
+        });
+    }
+    
+    // Setup trades-sort dropdown
+    const tradesSortDropdown = document.querySelector('#trades-sort');
+    if (tradesSortDropdown) {
+        tradesSortDropdown.addEventListener('change', function() {
+            applySorting(this.value);
+        });
+    }
+    
+    // Setup bot status toggle
+    const botStatusToggle = document.querySelector('#bot-status-toggle');
+    const botStatusText = document.querySelector('#bot-status-text');
+    if (botStatusToggle && botStatusText) {
+        botStatusToggle.addEventListener('change', function() {
+            if (this.checked) {
+                botStatusText.textContent = 'ON';
+                // In a real app, this would activate the bot
+                if (window.SniperApp && window.SniperApp.setBotStatus) {
+                    window.SniperApp.setBotStatus(true);
+                }
+                showNotification('Bot activated', 'success');
+            } else {
+                botStatusText.textContent = 'OFF';
+                // In a real app, this would deactivate the bot
+                if (window.SniperApp && window.SniperApp.setBotStatus) {
+                    window.SniperApp.setBotStatus(false);
+                }
+                showNotification('Bot deactivated', 'info');
+            }
+        });
+    }
+    */
+}
+
+// Apply filter to active trades
+function applyTradeFilter(filterType) {
+    console.log('Applying filter:', filterType);
+    
+    // Filter trades in new UI
+    const compactTradeItems = document.querySelectorAll('.compact-trade-item');
+    compactTradeItems.forEach(item => {
+        const profitCell = item.querySelector('.profit-cell');
+        
+        if (filterType === 'all') {
+            item.style.display = '';
+        } else if (filterType === 'profit' && profitCell && profitCell.classList.contains('positive')) {
+            item.style.display = '';
+        } else if (filterType === 'loss' && profitCell && profitCell.classList.contains('negative')) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    // Filter trades in table UI
+    const tableRows = document.querySelectorAll('#open-trades-table tr[data-trade-id]');
+    tableRows.forEach(row => {
+        const profitCell = row.querySelector('td.positive, td.negative');
+        
+        if (filterType === 'all') {
+            row.style.display = '';
+        } else if (filterType === 'profit' && profitCell && profitCell.classList.contains('positive')) {
+            row.style.display = '';
+        } else if (filterType === 'loss' && profitCell && profitCell.classList.contains('negative')) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Apply sorting to active trades
+function applySorting(sortType) {
+    console.log('Applying sorting:', sortType);
+    
+    // Sort function for different sort types
+    const getSortValue = (item, type) => {
+        switch (type) {
+            case 'profit': {
+                const profitText = item.querySelector('.profit-cell');
+                if (profitText) {
+                    // Extract percentage from text like +142%
+                    const match = profitText.textContent.match(/([+-]?\d+(?:\.\d+)?)%/);
+                    return match ? parseFloat(match[1]) : 0;
+                }
+                return 0;
+            }
+            case 'time': {
+                const timeCell = item.querySelector('.trade-cell:nth-child(9)');
+                if (timeCell) {
+                    // Convert time string to minutes for sorting
+                    const timeText = timeCell.textContent;
+                    return convertTimeStringToMinutes(timeText);
+                }
+                return 0;
+            }
+            case 'score': {
+                const scoreCell = item.querySelector('.score-cell');
+                if (scoreCell) {
+                    return parseFloat(scoreCell.textContent) || 0;
+                }
+                return 0;
+            }
+            default:
+                return 0;
+        }
+    };
+    
+    // Sort compact trades
+    const compactTradesContainer = document.querySelector('.compact-trades-rows');
+    if (compactTradesContainer) {
+        const compactItems = Array.from(compactTradesContainer.querySelectorAll('.compact-trade-item'));
+        
+        compactItems.sort((a, b) => {
+            const aValue = getSortValue(a, sortType);
+            const bValue = getSortValue(b, sortType);
+            
+            return sortType === 'time' ? aValue - bValue : bValue - aValue;
+        });
+        
+        // Remove all items and re-append in sorted order
+        compactItems.forEach(item => compactTradesContainer.appendChild(item));
+    }
+    
+    // Sort table trades
+    const tableBody = document.querySelector('#open-trades-table');
+    if (tableBody) {
+        const tableRows = Array.from(tableBody.querySelectorAll('tr[data-trade-id]'));
+        
+        tableRows.sort((a, b) => {
+            let aValue, bValue;
+            
+            switch (sortType) {
+                case 'profit': {
+                    const aProfitCell = a.querySelector('td:nth-child(4)');
+                    const bProfitCell = b.querySelector('td:nth-child(4)');
+                    aValue = aProfitCell ? parseFloat(aProfitCell.textContent.replace(/[+%]/g, '')) : 0;
+                    bValue = bProfitCell ? parseFloat(bProfitCell.textContent.replace(/[+%]/g, '')) : 0;
+                    break;
+                }
+                case 'time': {
+                    const aTimeCell = a.querySelector('td:nth-child(9)');
+                    const bTimeCell = b.querySelector('td:nth-child(9)');
+                    aValue = aTimeCell ? convertTimeStringToMinutes(aTimeCell.textContent) : 0;
+                    bValue = bTimeCell ? convertTimeStringToMinutes(bTimeCell.textContent) : 0;
+                    break;
+                }
+                case 'score': {
+                    const aScoreCell = a.querySelector('td:nth-child(10)');
+                    const bScoreCell = b.querySelector('td:nth-child(10)');
+                    aValue = aScoreCell ? parseFloat(aScoreCell.textContent) : 0;
+                    bValue = bScoreCell ? parseFloat(bScoreCell.textContent) : 0;
+                    break;
+                }
+                default:
+                    aValue = 0;
+                    bValue = 0;
+            }
+            
+            return sortType === 'time' ? aValue - bValue : bValue - aValue;
+        });
+        
+        // Remove all rows and re-append in sorted order
+        tableRows.forEach(row => tableBody.appendChild(row));
+    }
+}
+
+// Helper function to convert time strings like "5h 12m" to minutes for sorting
+function convertTimeStringToMinutes(timeString) {
+    if (!timeString) return 0;
+    
+    let totalMinutes = 0;
+    
+    // Handle days: "2d 5h"
+    const daysMatch = timeString.match(/(\d+)d/);
+    if (daysMatch) {
+        totalMinutes += parseInt(daysMatch[1]) * 24 * 60;
+    }
+    
+    // Handle hours: "5h" or "5h 30m"
+    const hoursMatch = timeString.match(/(\d+)h/);
+    if (hoursMatch) {
+        totalMinutes += parseInt(hoursMatch[1]) * 60;
+    }
+    
+    // Handle minutes: "30m"
+    const minutesMatch = timeString.match(/(\d+)m/);
+    if (minutesMatch) {
+        totalMinutes += parseInt(minutesMatch[1]);
+    }
+    
+    return totalMinutes;
+}
+
+// Fetch open trades from SniperApp or simulate for demo
+function fetchOpenTrades() {
+    // In a real app, this would fetch from API or database
+    let openTrades = [];
+    
+    // Try to get trades from SniperApp if it exists
+    if (window.SniperApp && window.SniperApp.activeTrades) {
+        openTrades = window.SniperApp.activeTrades;
+    } else {
+        // Simulate trades for demo purposes with enhanced properties
+        openTrades = [
+            {
+                id: 'trade1',
+                tokenName: 'Solana',
+                tokenSymbol: 'SOL',
+                tokenAddress: '0x1234567890abcdef1234567890abcdef12345678',
+                entryPrice: 120.50,
+                currentPrice: 135.75,
+                amount: 2.5,
+                value: 339.38,
+                pnl: 38.13,
+                pnlPercent: 12.65,
+                timestamp: Date.now() - 48 * 60 * 60 * 1000,
+                holders: 756000,
+                lpStatus: 'Locked',
+                tax: '0%/0%',
+                source: 'DexScreener',
+                score: 9.6
+            },
+            {
+                id: 'trade2',
+                tokenName: 'Bonk',
+                tokenSymbol: 'BONK',
+                tokenAddress: '0xabcdef1234567890abcdef1234567890abcdef12',
+                entryPrice: 0.00002165,
+                currentPrice: 0.00001998,
+                amount: 25000000,
+                value: 499.50,
+                pnl: -41.75,
+                pnlPercent: -7.71,
+                timestamp: Date.now() - 24 * 60 * 60 * 1000,
+                holders: 52748,
+                lpStatus: 'Locked',
+                tax: '0%/0%',
+                source: 'Manual',
+                score: 9.8
+            },
+            {
+                id: 'trade3',
+                tokenName: 'Pepecoin',
+                tokenSymbol: 'PEPE',
+                tokenAddress: '0x123456789abcdef1234567890abcdef123456789',
+                entryPrice: 0.00000826,
+                currentPrice: 0.00002008,
+                amount: 50000000,
+                value: 1004.00,
+                pnl: 591.0,
+                pnlPercent: 143.10,
+                timestamp: Date.now() - 45 * 60 * 1000,
+                holders: 7842,
+                lpStatus: 'Locked',
+                tax: '5%/5%',
+                source: 'Pump.fun',
+                score: 9.2
+            },
+            {
+                id: 'trade4',
+                tokenName: 'Wifedoge',
+                tokenSymbol: 'WIF',
+                tokenAddress: '0x1234abcdef1234567890abcdef1234567890abcd',
+                entryPrice: 0.00100,
+                currentPrice: 0.00187,
+                amount: 8500,
+                value: 15.90,
+                pnl: 7.30,
+                pnlPercent: 87.00,
+                timestamp: Date.now() - 2 * 60 * 60 * 1000,
+                holders: 14326,
+                lpStatus: 'Locked',
+                tax: '3%/3%',
+                source: 'DexScreener',
+                score: 8.5
+            }
+        ];
+    }
+    
+    // Enhance trades with additional properties if they don't exist
+    openTrades = openTrades.map(trade => {
+        if (!trade.holders) {
+            trade.holders = Math.floor(Math.random() * 100000);
+        }
+        
+        if (!trade.lpStatus) {
+            trade.lpStatus = Math.random() > 0.2 ? 'Locked' : 'Unlocked';
+        }
+        
+        if (!trade.tax) {
+            const buyTax = Math.floor(Math.random() * 15);
+            const sellTax = Math.floor(Math.random() * 15);
+            trade.tax = `${buyTax}%/${sellTax}%`;
+        }
+        
+        if (!trade.source) {
+            const sources = ['DexScreener', 'Birdeye', 'Manual', 'Pump.fun', 'Telegram'];
+            trade.source = sources[Math.floor(Math.random() * sources.length)];
+        }
+        
+        if (!trade.score) {
+            trade.score = (5 + Math.random() * 5).toFixed(1);
+        }
+        
+        return trade;
+    });
+    
+    renderOpenTrades(openTrades);
+    updateTotalPnl(openTrades);
+}
+
+// Render open trades in the UI
+function renderOpenTrades(trades) {
+    // Support for both legacy UI and new UI design
+    const legacyTradesContainer = document.querySelector('.active-trades-container');
+    const newTradesContainer = document.querySelector('.compact-trades-rows');
+    
+    // Update counter elements
+    const openTradesCountElement = document.querySelector('#open-trades-count');
+    if (openTradesCountElement) {
+        openTradesCountElement.textContent = trades.length;
+    }
+    
+    const openTradesElement = document.querySelector('#open-trades');
+    if (openTradesElement) {
+        openTradesElement.textContent = trades.length;
+    }
+    
+    // Count profit/loss trades and calculate amounts
+    const profitTrades = trades.filter(trade => trade.pnl > 0);
+    const lossTrades = trades.filter(trade => trade.pnl < 0);
+    const totalProfit = profitTrades.reduce((sum, trade) => sum + trade.pnl, 0);
+    const totalLoss = lossTrades.reduce((sum, trade) => sum + trade.pnl, 0);
+    
+    // Update profit/loss counters if they exist
+    const profitCountElement = document.querySelector('#profit-count');
+    const profitAmountElement = document.querySelector('#profit-amount');
+    const lossCountElement = document.querySelector('#loss-count');
+    const lossAmountElement = document.querySelector('#loss-amount');
+    
+    if (profitCountElement) profitCountElement.textContent = profitTrades.length;
+    if (profitAmountElement) {
+        profitAmountElement.textContent = formatCurrency(totalProfit);
+        profitAmountElement.className = 'positive';
+    }
+    
+    if (lossCountElement) lossCountElement.textContent = lossTrades.length;
+    if (lossAmountElement) {
+        lossAmountElement.textContent = formatCurrency(totalLoss);
+        lossAmountElement.className = 'negative';
+    }
+    
+    // Update total profit display
+    const totalProfitElement = document.querySelector('#total-profit');
+    if (totalProfitElement) {
+        const netProfit = totalProfit + totalLoss;
+        totalProfitElement.textContent = formatCurrency(netProfit);
+        totalProfitElement.className = netProfit >= 0 ? 'positive' : 'negative';
+    }
+    
+    // Render in legacy container if it exists
+    if (legacyTradesContainer) {
+        legacyTradesContainer.innerHTML = '';
+        
+        if (trades.length === 0) {
+            legacyTradesContainer.innerHTML = '<div class="no-trades-message">No active trades at the moment</div>';
+            return;
+        }
+        
+        trades.forEach(trade => {
+            const isProfitable = trade.pnl > 0;
+            const formattedPnl = (trade.pnl >= 0 ? '+' : '') + formatCurrency(trade.pnl);
+            const formattedPnlPercent = (trade.pnlPercent >= 0 ? '+' : '') + trade.pnlPercent.toFixed(2) + '%';
+            
+            const tradeCard = document.createElement('div');
+            tradeCard.className = `trade-card${!isProfitable ? ' negative' : ''}`;
+            tradeCard.setAttribute('data-trade-id', trade.id);
+            tradeCard.setAttribute('data-token-address', trade.tokenAddress);
+            
+            tradeCard.innerHTML = `
+                <div class="trade-header">
+                    <div>
+                        <span class="token-name">${trade.tokenName}</span>
+                        <span class="token-symbol">${trade.tokenSymbol}</span>
+                    </div>
+                    <div class="trade-profit${!isProfitable ? ' negative' : ''}">
+                        ${formattedPnl} (${formattedPnlPercent})
+                    </div>
+                </div>
+                <div class="trade-details">
+                    <div class="trade-detail-item">
+                        <span>Entry Price</span>
+                        <span>${formatCurrency(trade.entryPrice)}</span>
+                    </div>
+                    <div class="trade-detail-item">
+                        <span>Current Price</span>
+                        <span>${formatCurrency(trade.currentPrice)}</span>
+                    </div>
+                    <div class="trade-detail-item">
+                        <span>Amount</span>
+                        <span>${formatNumber(trade.amount)} ${trade.tokenSymbol}</span>
+                    </div>
+                    <div class="trade-detail-item">
+                        <span>Value</span>
+                        <span>${formatCurrency(trade.value)}</span>
+                    </div>
+                </div>
+                <div class="trade-actions">
+                    <button class="trade-action-btn info" data-action="info" data-trade-id="${trade.id}" data-token-address="${trade.tokenAddress}">Details</button>
+                    <button class="trade-action-btn tp" data-action="take-profit" data-trade-id="${trade.id}" data-token-address="${trade.tokenAddress}">Take Profit</button>
+                    <button class="trade-action-btn sell" data-action="sell" data-trade-id="${trade.id}" data-token-address="${trade.tokenAddress}">Sell</button>
+                </div>
+            `;
+            
+            legacyTradesContainer.appendChild(tradeCard);
+        });
+        
+        // Add event listeners to trade action buttons
+        const actionButtons = legacyTradesContainer.querySelectorAll('.trade-action-btn');
+        actionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const action = this.getAttribute('data-action');
+                const tradeId = this.getAttribute('data-trade-id');
+                const tokenAddress = this.getAttribute('data-token-address');
+                handleTradeAction(action, tradeId, tokenAddress);
+            });
+        });
+    }
+    
+    // Render in new container if it exists
+    if (newTradesContainer) {
+        newTradesContainer.innerHTML = '';
+        
+        if (trades.length === 0) {
+            newTradesContainer.innerHTML = '<div class="no-trades-message">No active trades at the moment</div>';
+            return;
+        }
+        
+        // Populate the new compact trades table
+        trades.forEach(trade => {
+            const isProfitable = trade.pnl > 0;
+            const formattedPnlPercent = (trade.pnlPercent >= 0 ? '+' : '') + trade.pnlPercent.toFixed(2) + '%';
+            
+            // Calculate time since trade
+            const timeSince = getTimeSince(trade.timestamp);
+            
+            // Token symbol first letter for icon
+            const iconLetter = trade.tokenSymbol.charAt(0);
+            
+            // Default values for properties that might not exist in all trades
+            const holders = trade.holders || '?';
+            const lpStatus = trade.lpStatus || 'Unknown';
+            const tax = trade.tax || '?/?';
+            const source = trade.source || 'Manual';
+            const score = trade.score || '-';
+            
+            const tradeItem = document.createElement('div');
+            tradeItem.className = 'compact-trade-item';
+            tradeItem.setAttribute('data-trade-id', trade.id);
+            tradeItem.setAttribute('data-token-address', trade.tokenAddress);
+            
+            tradeItem.innerHTML = `
+                <div class="trade-cell token-cell">
+                    <div class="compact-token-icon">${iconLetter}</div>
+                    <span class="compact-token-name">${trade.tokenSymbol}</span>
+                </div>
+                <div class="trade-cell">${formatCurrency(trade.entryPrice)}</div>
+                <div class="trade-cell">${formatCurrency(trade.currentPrice)}</div>
+                <div class="trade-cell profit-cell ${isProfitable ? 'positive' : 'negative'}">${formattedPnlPercent}</div>
+                <div class="trade-cell">${formatNumber(trade.value / trade.currentPrice)} ${trade.tokenSymbol}</div>
+                <div class="trade-cell">${formatNumber(holders)}</div>
+                <div class="trade-cell status-cell"><span class="${lpStatus === 'Locked' ? 'positive-status' : 'warning-status'}">${lpStatus}</span></div>
+                <div class="trade-cell">${tax}</div>
+                <div class="trade-cell">${timeSince}</div>
+                <div class="trade-cell score-cell">${score}</div>
+                <div class="trade-cell">${source}</div>
+                <div class="trade-cell action-cell">
+                    <button class="compact-sell-btn" data-action="sell" data-trade-id="${trade.id}" data-token-address="${trade.tokenAddress}">Sell</button>
+                </div>
+            `;
+            
+            newTradesContainer.appendChild(tradeItem);
+        });
+        
+        // Add event listeners to compact sell buttons
+        const sellButtons = newTradesContainer.querySelectorAll('.compact-sell-btn');
+        sellButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const tradeId = this.getAttribute('data-trade-id');
+                const tokenAddress = this.getAttribute('data-token-address');
+                handleTradeAction('sell', tradeId, tokenAddress);
+            });
+        });
+        
+        // Also populate the open-trades-table if it exists
+        const openTradesTable = document.querySelector('#open-trades-table');
+        if (openTradesTable) {
+            openTradesTable.innerHTML = '';
+            
+            trades.forEach(trade => {
+                const isProfitable = trade.pnl > 0;
+                const formattedPnlPercent = (trade.pnlPercent >= 0 ? '+' : '') + trade.pnlPercent.toFixed(2) + '%';
+                const timeSince = getTimeSince(trade.timestamp);
+                const iconLetter = trade.tokenSymbol.charAt(0);
+                const holders = trade.holders || '?';
+                const lpStatus = trade.lpStatus || 'Unknown';
+                const tax = trade.tax || '?/?';
+                const source = trade.source || 'Manual';
+                const score = trade.score || '-';
+                
+                const row = document.createElement('tr');
+                row.setAttribute('data-trade-id', trade.id);
+                row.setAttribute('data-token-address', trade.tokenAddress);
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="token-cell-table">
+                            <div class="token-icon-table">${iconLetter}</div>
+                            <span>${trade.tokenSymbol}</span>
+                        </div>
+                    </td>
+                    <td>${formatCurrency(trade.entryPrice)}</td>
+                    <td>${formatCurrency(trade.currentPrice)}</td>
+                    <td class="${isProfitable ? 'positive' : 'negative'}">${formattedPnlPercent}</td>
+                    <td>${formatNumber(trade.value / trade.currentPrice)} ${trade.tokenSymbol}</td>
+                    <td>${formatNumber(holders)}</td>
+                    <td><span class="${lpStatus === 'Locked' ? 'positive-status' : 'warning-status'}">${lpStatus}</span></td>
+                    <td>${tax}</td>
+                    <td>${timeSince}</td>
+                    <td>${score}</td>
+                    <td>${source}</td>
+                    <td>
+                        <button class="table-action-btn sell-btn" data-action="sell" data-trade-id="${trade.id}" data-token-address="${trade.tokenAddress}">Sell</button>
+                    </td>
+                `;
+                
+                openTradesTable.appendChild(row);
+            });
+            
+            // Add event listeners to table action buttons
+            const tableActionButtons = openTradesTable.querySelectorAll('.table-action-btn');
+            tableActionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    const tradeId = this.getAttribute('data-trade-id');
+                    const tokenAddress = this.getAttribute('data-token-address');
+                    handleTradeAction(action, tradeId, tokenAddress);
+                });
+            });
+        }
+    }
+}
+
+// Helper function to calculate time since trade
+function getTimeSince(timestamp) {
+    if (!timestamp) return '-';
+    
+    const now = Date.now();
+    const diff = now - timestamp;
+    
+    // Convert to minutes
+    const minutes = Math.floor(diff / (1000 * 60));
+    
+    if (minutes < 60) {
+        return `${minutes}m`;
+    } else if (minutes < 24 * 60) {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${hours}h ${mins}m`;
+    } else {
+        const days = Math.floor(minutes / (60 * 24));
+        const hours = Math.floor((minutes % (60 * 24)) / 60);
+        return `${days}d ${hours}h`;
+    }
+}
+
+// Update total PnL in UI
+function updateTotalPnl(trades) {
+    const totalPnl = trades.reduce((total, trade) => total + trade.pnl, 0);
+    const pnlDisplay = document.querySelector('.trades-pnl');
+    if (pnlDisplay) {
+        pnlDisplay.textContent = formatCurrency(totalPnl);
+        pnlDisplay.className = `trades-pnl${totalPnl < 0 ? ' negative' : ''}`;
+    }
+}
+
+// Update dashboard statistics
+function updateDashboardStats(trades = []) {
+    // Try to get wallet balance from SniperApp
+    let walletBalance = 0;
+    if (window.SniperApp && window.SniperApp.walletBalance) {
+        walletBalance = window.SniperApp.walletBalance;
+    } else {
+        walletBalance = 2500.00; // Example value
+    }
+    
+    // Calculate stats from trades
+    const openTradesCount = trades.length || 0;
+    const totalPnl = trades.reduce((total, trade) => total + trade.pnl, 0) || 0;
+    
+    // Try to get daily volume from SniperApp
+    let dailyVolume = 0;
+    if (window.SniperApp && window.SniperApp.dailyVolume) {
+        dailyVolume = window.SniperApp.dailyVolume;
+    } else {
+        dailyVolume = 1250.75; // Example value
+    }
+    
+    // Update stats in the UI
+    const walletBalanceElement = document.querySelector('#wallet-balance');
+    if (walletBalanceElement) {
+        walletBalanceElement.textContent = formatCurrency(walletBalance);
+    }
+    
+    const openTradesElement = document.querySelector('#open-trades');
+    if (openTradesElement) {
+        openTradesElement.textContent = openTradesCount;
+    }
+    
+    const totalPnlElement = document.querySelector('#total-pnl');
+    if (totalPnlElement) {
+        totalPnlElement.textContent = formatCurrency(totalPnl);
+        totalPnlElement.className = 'stat-value' + (totalPnl < 0 ? ' negative' : '');
+    }
+    
+    const dailyVolumeElement = document.querySelector('#daily-volume');
+    if (dailyVolumeElement) {
+        dailyVolumeElement.textContent = formatCurrency(dailyVolume);
+    }
+}
+
+// Handle trade actions (Details, Take Profit, Sell)
+function handleTradeAction(action, tradeId, tokenAddress) {
+    console.log(`Action ${action} for trade ${tradeId} (${tokenAddress})`);
+    
+    // If SniperApp is available, delegate to its methods
+    if (window.SniperApp) {
+        switch (action) {
+            case 'info':
+                window.SniperApp.showTokenInfo(tokenAddress);
+                break;
+            case 'take-profit':
+                window.SniperApp.takeProfit(tokenAddress);
+                break;
+            case 'sell':
+                window.SniperApp.sellToken(tokenAddress);
+                break;
+        }
+        return;
+    }
+    
+    // Otherwise, handle locally
+    switch (action) {
+        case 'info':
+            showTradeDetails(tradeId, tokenAddress);
+            break;
+        case 'take-profit':
+            takeProfitForTrade(tradeId, tokenAddress);
+            break;
+        case 'sell':
+            sellTrade(tradeId, tokenAddress);
+            break;
+    }
+}
+
+// Take profits for all profitable trades
+function takeAllProfits() {
+    // Get all profitable trades
+    let profitableTrades = [];
+    
+    if (window.SniperApp && window.SniperApp.activeTrades) {
+        profitableTrades = window.SniperApp.activeTrades.filter(trade => trade.pnl > 0);
+        
+        if (profitableTrades.length === 0) {
+            showNotification('No profitable trades to take profit from', 'info');
+            return;
+        }
+        
+        // Use SniperApp method if available
+        if (window.SniperApp.takeAllProfits) {
+            window.SniperApp.takeAllProfits();
+            return;
+        }
+        
+        // Otherwise iterate through trades
+        profitableTrades.forEach(trade => {
+            window.SniperApp.takeProfit(trade.tokenAddress);
+        });
+        
+        showNotification(`Taking profit from ${profitableTrades.length} trades`, 'success');
+        return;
+    }
+    
+    // Handle locally if SniperApp not available
+    // Check both legacy and new UI
+    const legacyTradeElements = document.querySelectorAll('.trade-card:not(.negative)');
+    const newTradeElements = document.querySelectorAll('.compact-trade-item .profit-cell.positive');
+    const tableTradeElements = document.querySelectorAll('#open-trades-table td.positive');
+    
+    // Collect all profitable trades from all UI elements
+    let allProfitableTradeElements = [];
+    
+    // Add legacy UI elements
+    legacyTradeElements.forEach(element => {
+        const tradeId = element.getAttribute('data-trade-id');
+        const tokenAddress = element.getAttribute('data-token-address');
+        
+        allProfitableTradeElements.push({
+            element: element,
+            id: tradeId,
+            tokenAddress: tokenAddress,
+            ui: 'legacy'
+        });
+    });
+    
+    // Add new UI elements
+    newTradeElements.forEach(element => {
+        const tradeItem = element.closest('.compact-trade-item');
+        if (tradeItem) {
+            const tradeId = tradeItem.getAttribute('data-trade-id');
+            const tokenAddress = tradeItem.getAttribute('data-token-address');
+            
+            allProfitableTradeElements.push({
+                element: tradeItem,
+                id: tradeId,
+                tokenAddress: tokenAddress,
+                ui: 'compact'
+            });
+        }
+    });
+    
+    // Add table UI elements
+    tableTradeElements.forEach(element => {
+        const row = element.closest('tr');
+        if (row) {
+            const tradeId = row.getAttribute('data-trade-id');
+            const tokenAddress = row.getAttribute('data-token-address');
+            
+            allProfitableTradeElements.push({
+                element: row,
+                id: tradeId,
+                tokenAddress: tokenAddress,
+                ui: 'table'
+            });
+        }
+    });
+    
+    // Remove duplicates (same trade might appear in multiple UIs)
+    const uniqueTrades = [];
+    const tradeIds = new Set();
+    
+    allProfitableTradeElements.forEach(trade => {
+        if (!tradeIds.has(trade.id)) {
+            tradeIds.add(trade.id);
+            uniqueTrades.push(trade);
+        }
+    });
+    
+    profitableTrades = uniqueTrades;
+    
+    if (profitableTrades.length === 0) {
+        showNotification('No profitable trades to take profit from', 'info');
+        return;
+    }
+    
+    // Take profits for all profitable trades
+    profitableTrades.forEach(trade => {
+        takeProfitForTrade(trade.id, trade.tokenAddress);
+    });
+    
+    showNotification(`Taking profit from ${profitableTrades.length} trades`, 'success');
+}
+
+// Take profit for a specific trade
+function takeProfitForTrade(tradeId, tokenAddress) {
+    console.log(`Taking profit for trade ${tradeId} (${tokenAddress})`);
+    
+    // For demo purposes, remove the trade from UI after a short delay
+    setTimeout(() => {
+        // Find the trade in all possible UI elements
+        const legacyTradeElement = document.querySelector(`.trade-card[data-trade-id="${tradeId}"]`);
+        const compactTradeElement = document.querySelector(`.compact-trade-item[data-trade-id="${tradeId}"]`);
+        const tableTradeElement = document.querySelector(`#open-trades-table tr[data-trade-id="${tradeId}"]`);
+        
+        // Add fade-out animation to all found elements
+        if (legacyTradeElement) {
+            legacyTradeElement.classList.add('fade-out');
+            setTimeout(() => {
+                legacyTradeElement.remove();
+                
+                // Check if there are no more trades in legacy UI
+                const remainingLegacyTrades = document.querySelectorAll('.trade-card');
+                if (remainingLegacyTrades.length === 0) {
+                    const legacyTradesContainer = document.querySelector('.active-trades-container');
+                    if (legacyTradesContainer) {
+                        legacyTradesContainer.innerHTML = '<div class="no-trades-message">No active trades at the moment</div>';
+                    }
+                }
+            }, 300);
+        }
+        
+        if (compactTradeElement) {
+            compactTradeElement.classList.add('fade-out');
+            setTimeout(() => {
+                compactTradeElement.remove();
+                
+                // Check if there are no more trades in new UI
+                const remainingCompactTrades = document.querySelectorAll('.compact-trade-item');
+                if (remainingCompactTrades.length === 0) {
+                    const compactTradesContainer = document.querySelector('.compact-trades-rows');
+                    if (compactTradesContainer) {
+                        compactTradesContainer.innerHTML = '<div class="no-trades-message">No active trades at the moment</div>';
+                    }
+                }
+            }, 300);
+        }
+        
+        if (tableTradeElement) {
+            tableTradeElement.classList.add('fade-out');
+            setTimeout(() => {
+                tableTradeElement.remove();
+                
+                // Check if there are no more trades in table UI
+                const remainingTableTrades = document.querySelectorAll('#open-trades-table tr');
+                if (remainingTableTrades.length === 0) {
+                    const openTradesTable = document.querySelector('#open-trades-table');
+                    if (openTradesTable) {
+                        const noTradesRow = document.createElement('tr');
+                        noTradesRow.innerHTML = '<td colspan="12" class="no-trades-message">No active trades at the moment</td>';
+                        openTradesTable.appendChild(noTradesRow);
+                    }
+                }
+            }, 300);
+        }
+        
+        // Update counters and stats after removing trades
+        updateTradeCounters();
+        updateDashboardStats();
+        
+        showNotification(`Profit taken for ${tradeId}`, 'success');
+    }, 500);
+}
+
+// Sell a specific trade
+function sellTrade(tradeId, tokenAddress) {
+    console.log(`Selling trade ${tradeId} (${tokenAddress})`);
+    
+    // For demo purposes, remove the trade from UI after a short delay
+    setTimeout(() => {
+        // Find the trade in all possible UI elements
+        const legacyTradeElement = document.querySelector(`.trade-card[data-trade-id="${tradeId}"]`);
+        const compactTradeElement = document.querySelector(`.compact-trade-item[data-trade-id="${tradeId}"]`);
+        const tableTradeElement = document.querySelector(`#open-trades-table tr[data-trade-id="${tradeId}"]`);
+        
+        // Add fade-out animation to all found elements
+        if (legacyTradeElement) {
+            legacyTradeElement.classList.add('fade-out');
+            setTimeout(() => {
+                legacyTradeElement.remove();
+                
+                // Check if there are no more trades in legacy UI
+                const remainingLegacyTrades = document.querySelectorAll('.trade-card');
+                if (remainingLegacyTrades.length === 0) {
+                    const legacyTradesContainer = document.querySelector('.active-trades-container');
+                    if (legacyTradesContainer) {
+                        legacyTradesContainer.innerHTML = '<div class="no-trades-message">No active trades at the moment</div>';
+                    }
+                }
+            }, 300);
+        }
+        
+        if (compactTradeElement) {
+            compactTradeElement.classList.add('fade-out');
+            setTimeout(() => {
+                compactTradeElement.remove();
+                
+                // Check if there are no more trades in new UI
+                const remainingCompactTrades = document.querySelectorAll('.compact-trade-item');
+                if (remainingCompactTrades.length === 0) {
+                    const compactTradesContainer = document.querySelector('.compact-trades-rows');
+                    if (compactTradesContainer) {
+                        compactTradesContainer.innerHTML = '<div class="no-trades-message">No active trades at the moment</div>';
+                    }
+                }
+            }, 300);
+        }
+        
+        if (tableTradeElement) {
+            tableTradeElement.classList.add('fade-out');
+            setTimeout(() => {
+                tableTradeElement.remove();
+                
+                // Check if there are no more trades in table UI
+                const remainingTableTrades = document.querySelectorAll('#open-trades-table tr');
+                if (remainingTableTrades.length === 0) {
+                    const openTradesTable = document.querySelector('#open-trades-table');
+                    if (openTradesTable) {
+                        const noTradesRow = document.createElement('tr');
+                        noTradesRow.innerHTML = '<td colspan="12" class="no-trades-message">No active trades at the moment</td>';
+                        openTradesTable.appendChild(noTradesRow);
+                    }
+                }
+            }, 300);
+        }
+        
+        // Update counters and stats after removing trades
+        updateTradeCounters();
+        updateDashboardStats();
+        
+        showNotification(`Trade ${tradeId} sold`, 'info');
+    }, 500);
+}
+
+// Update trade counters after trade actions
+function updateTradeCounters() {
+    // Count different types of trades in the UI
+    const legacyTrades = document.querySelectorAll('.trade-card');
+    const compactTrades = document.querySelectorAll('.compact-trade-item');
+    const tableTrades = document.querySelectorAll('#open-trades-table tr[data-trade-id]');
+    
+    // Use the longest array of trades to determine count
+    const tradeCount = Math.max(
+        legacyTrades.length,
+        compactTrades.length,
+        tableTrades.length
+    );
+    
+    // Update counter elements
+    const openTradesCountElement = document.querySelector('#open-trades-count');
+    if (openTradesCountElement) {
+        openTradesCountElement.textContent = tradeCount;
+    }
+    
+    const openTradesElement = document.querySelector('#open-trades');
+    if (openTradesElement) {
+        openTradesElement.textContent = tradeCount;
+    }
+    
+    // Count profit/loss trades
+    const profitTrades = document.querySelectorAll('.profit-cell.positive');
+    const lossTrades = document.querySelectorAll('.profit-cell.negative');
+    
+    const profitCountElement = document.querySelector('#profit-count');
+    if (profitCountElement) {
+        profitCountElement.textContent = profitTrades.length;
+    }
+    
+    const lossCountElement = document.querySelector('#loss-count');
+    if (lossCountElement) {
+        lossCountElement.textContent = lossTrades.length;
+    }
+}
+
+// Show details for a specific trade
+function showTradeDetails(tradeId, tokenAddress) {
+    console.log(`Showing details for trade ${tradeId} (${tokenAddress})`);
+    showNotification(`Viewing details for ${tradeId}`, 'info');
+    
+    // In a real app, this would open a modal with detailed trade information
+}
+
+// Display a notification to the user
+function showNotification(message, type = 'info') {
+    let notificationContainer = document.getElementById('notification-container');
+    
+    if (!notificationContainer) {
+        notificationContainer = document.createElement('div');
+        notificationContainer.id = 'notification-container';
+        document.body.appendChild(notificationContainer);
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = message;
+    
+    notificationContainer.appendChild(notification);
+    
+    // Remove notification after 3 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
+}
+
+// Chart Functionality
+function initializeDashboardChart() {
+    const chartCanvas = document.getElementById('main-dashboard-chart');
+    if (!chartCanvas) {
+        console.error('Could not find canvas element with id main-dashboard-chart');
+        return;
+    }
+    
+    // Get default time range from dropdown
+    const timeRangeDropdown = document.querySelector('.time-range-dropdown');
+    let defaultRange = '7d';
+    
+    if (timeRangeDropdown) {
+        const dropdownToggle = timeRangeDropdown.querySelector('.dropdown-toggle');
+        if (dropdownToggle) {
+            defaultRange = dropdownToggle.textContent.trim();
+        }
+    }
+    
+    // Render chart with default range
+    renderDashboardChart(defaultRange);
+}
+
+// Render the dashboard chart with specific time range
+function renderDashboardChart(range = '7d') {
+    console.log(`Generating chart data for range: ${range}`);
+    
+    // Try to get data from SniperApp first
+    let chartData;
+    if (window.SniperApp && window.SniperApp.getChartData) {
+        chartData = window.SniperApp.getChartData(range);
+    } else {
+        // Generate sample data if SniperApp not available
+        chartData = generateSampleChartData(range);
+    }
+    
+    const ctx = document.getElementById('main-dashboard-chart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.dashboardChart) {
+        window.dashboardChart.destroy();
+    }
+    
+    // Create new chart
+    window.dashboardChart = new Chart(ctx, getLineChartConfig(chartData, ctx));
+}
+
+// Update chart with new data
+function updateChartData(chartData) {
+    if (!window.dashboardChart) {
+        initializeDashboardChart();
+        return;
+    }
+    
+    // Update chart data
+    window.dashboardChart.data.labels = chartData.labels;
+    window.dashboardChart.data.datasets[0].data = chartData.values;
+    
+    // Update chart
+    window.dashboardChart.update();
+}
+
+// Get chart configuration
+function getLineChartConfig(chartData, ctx) {
+    // Create gradient for area under line
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(79, 57, 250, 0.5)');
+    gradient.addColorStop(0.5, 'rgba(79, 57, 250, 0.25)');
+    gradient.addColorStop(1, 'rgba(79, 57, 250, 0)');
+    
+    return {
+        type: 'line',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Portfolio Value',
+                data: chartData.values,
+                borderColor: '#4f39fa',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                pointBackgroundColor: '#4f39fa',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 1,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(30, 30, 30, 0.8)',
+                    padding: 10,
+                    cornerRadius: 6,
+                    displayColors: false,
+                    titleFont: {
+                        size: 13,
+                        weight: 'normal'
+                    },
+                    bodyFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            return '$' + context.raw.toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#a0a0a0',
+                        font: {
+                            size: 11
+                        },
+                        maxRotation: 0
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(200, 200, 200, 0.1)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#a0a0a0',
+                        font: {
+                            size: 11
+                        },
+                        callback: function(value) {
+                            if (value >= 1000) {
+                                return '$' + value / 1000 + 'k';
+                            }
+                            return '$' + value;
+                        }
+                    }
+                }
+            }
+        }
+    };
+}
+
+// Generate sample chart data for demo
+function generateSampleChartData(range) {
+    // Calculate data parameters based on the range
+    const { dataPoints, timeFormat, startValue, volatility, interval } = calculateChartParams(range);
+    
+    // Generate time labels
+    const labels = [];
+    const values = [];
+    
+    const now = new Date();
+    let value = startValue;
+    
+    for (let i = 0; i < dataPoints; i++) {
+        // Generate date label
+        const date = new Date(now);
+        
+        // Adjust date based on range and current index
+        switch (range) {
+            case '24h':
+                date.setHours(date.getHours() - (dataPoints - i));
+                break;
+            case '7d':
+                date.setDate(date.getDate() - (dataPoints - i) / 4);
+                break;
+            case '30d':
+                date.setDate(date.getDate() - (dataPoints - i));
+                break;
+            case '3m':
+                date.setDate(date.getDate() - (dataPoints - i) * 3);
+                break;
+            case '1y':
+                date.setDate(date.getDate() - (dataPoints - i) * 12);
+                break;
+            default:
+                date.setDate(date.getDate() - (dataPoints - i));
+        }
+        
+        // Format date based on time format
+        let formattedDate;
+        switch (timeFormat) {
+            case 'hour':
+                formattedDate = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                break;
+            case 'day':
+                formattedDate = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                break;
+            case 'week':
+                formattedDate = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                break;
+            case 'month':
+                formattedDate = date.toLocaleDateString([], { month: 'short', year: 'numeric' });
+                break;
+            default:
+                formattedDate = date.toLocaleDateString();
+        }
+        
+        labels.push(formattedDate);
+        
+        // Generate random value change with upward trend
+        const change = (Math.random() * 2 - 0.7) * volatility;
+        value = Math.max(100, value * (1 + change / 100));
+        
+        values.push(parseFloat(value.toFixed(2)));
+    }
+    
+    return { labels, values };
+}
+
+// Calculate chart parameters based on selected time range
+function calculateChartParams(range) {
+    let dataPoints, timeFormat, startValue, volatility, interval;
+    
+    switch (range) {
+        case '24h':
+            dataPoints = 24;
+            timeFormat = 'hour';
+            startValue = 2250;
+            volatility = 2;
+            interval = 60 * 60 * 1000; // 1 hour
+            break;
+        case '7d':
+            dataPoints = 28;
+            timeFormat = 'day';
+            startValue = 2000;
+            volatility = 3;
+            interval = 6 * 60 * 60 * 1000; // 6 hours
+            break;
+        case '30d':
+            dataPoints = 30;
+            timeFormat = 'day';
+            startValue = 1800;
+            volatility = 4;
+            interval = 24 * 60 * 60 * 1000; // 1 day
+            break;
+        case '3m':
+            dataPoints = 30;
+            timeFormat = 'week';
+            startValue = 1500;
+            volatility = 5;
+            interval = 3 * 24 * 60 * 60 * 1000; // 3 days
+            break;
+        case '1y':
+            dataPoints = 24;
+            timeFormat = 'month';
+            startValue = 1000;
+            volatility = 7;
+            interval = 15 * 24 * 60 * 60 * 1000; // 15 days
+            break;
+        default:
+            dataPoints = 28;
+            timeFormat = 'day';
+            startValue = 2000;
+            volatility = 3;
+            interval = 6 * 60 * 60 * 1000; // 6 hours
+    }
+    
+    return { dataPoints, timeFormat, startValue, volatility, interval };
+}
+
+// Format currency values
+function formatCurrency(value) {
+    return '$' + Number(value).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+// Format number values with K/M suffix
+function formatNumber(value) {
+    if (value >= 1000000) {
+        return (value / 1000000).toFixed(2) + 'M';
+    } else if (value >= 1000) {
+        return (value / 1000).toFixed(2) + 'K';
+    } else {
+        return value.toLocaleString('en-US');
+    }
+}
+
+// Set a default interval for chart updates
+const DEFAULT_REFRESH_INTERVAL = 60000; // 1 minute in milliseconds
+let interval = Math.max(DEFAULT_REFRESH_INTERVAL, 1);
+
+// Re-add DOMContentLoaded listener in case this script is loaded after the event has fired
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(() => {
+        if (typeof Chart !== 'undefined') {
+            initializeDashboard();
+        } else {
+            console.error('Chart.js library not loaded');
+        }
+    }, 1);
+} 

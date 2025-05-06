@@ -1,0 +1,17 @@
+{
+  "name": "wolf63x-sniper",
+  "version": "1.0.0",
+  "description": "A modern dashboard and trading interface for the Solana blockchain, featuring real-time chart visualization, active trades management, and token sniping capabilities.",
+  "main": "build.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@solana/web3.js": "^1.89.0"
+  }
+}

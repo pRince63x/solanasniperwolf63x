@@ -1,0 +1,55 @@
+{
+  "bot": {
+    "name": "Wolf63x Sniper",
+    "version": "0.2.0",
+    "autoStart": false,
+    "theme": "green"
+  },
+  "trading": {
+    "maxBuyAmount": 10,  // in SOL
+    "minBuyAmount": 0.1, // in SOL
+    "maxSlippage": 1.0,  // percentage
+    "gasLimit": 300000,
+    "autoSell": {
+      "enabled": true,
+      "profitTarget": 50,  // percentage
+      "stopLoss": 20       // percentage
+    }
+  },
+  "scanner": {
+    "enabled": true,
+    "interval": 1000,     // milliseconds
+    "maxPairs": 100,
+    "minLiquidity": 1,    // in SOL
+    "excludeTokens": [],
+    "includePairs": ["SOL", "USDC", "USDT"]
+  },
+  "filters": {
+    "minHolders": 50,
+    "minTotalSupply": 1000,
+    "maxTotalSupply": 1000000000000,
+    "excludeHoneypot": true,
+    "excludeRenounced": false,
+    "minLPLocked": 30     // days
+  },
+  "ui": {
+    "refreshRate": 1000,  // milliseconds
+    "chartTimeframe": "1h",
+    "defaultCurrency": "USD",
+    "notifications": {
+      "enabled": true,
+      "sound": true,
+      "desktop": true
+    }
+  },
+  "advanced": {
+    "rpcEndpoints": [
+      "https://api.mainnet-beta.solana.com",
+      "https://solana-api.projectserum.com"
+    ],
+    "maxGwei": 100,
+    "maxPendingTx": 5,
+    "retryAttempts": 3,
+    "retryDelay": 1000    // milliseconds
+  }
+} 
